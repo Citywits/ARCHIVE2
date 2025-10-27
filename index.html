@@ -19,23 +19,23 @@
       --bg: #0b0d0e;
     }
 
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "BBH Sans Bogle", sans-serif;
-      overflow-x: hidden;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000; /* Optional: gives clean contrast edges */
+  overflow: hidden;
+}
 
-    /* Polaroid frame overlay */
-    .polaroid-frame {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: center / contain no-repeat url("Emerald-city/assets/images/polaroid-background.png");
-      pointer-events: none;
-    }
+.polaroid-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* ensures it stretches edge-to-edge */
+  z-index: 1;
+  pointer-events: none; /* lets you click elements under it if needed */
+}
 
     .content-wrap {
       position: relative;
@@ -131,8 +131,7 @@
   <!-- Main content inside frame -->
   <div class="content-wrap">
     <!-- Header -->
-    <img src="Emerald-city/assets/images/metal-writing-white.png" alt="Citywits Header" class="header-img">
-
+   <img src="Emerald-city/assets/images/polaroid-background.png" alt="Polaroid Frame" class="polaroid-frame">
     <!-- Welcome message -->
     <div class="section">
       <p class="welcome-text">
@@ -144,7 +143,7 @@
     <!-- Album promo video placeholder -->
     <div class="section">
       <div class="video-placeholder">
-        [ Album Promo Video Placeholder ]
+           <img src="Emerald-city/assets/images/polaroid-background.png" alt="Polaroid Frame" class="polaroid-frame">
       </div>
     </div>
 
