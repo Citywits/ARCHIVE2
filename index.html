@@ -22,19 +22,43 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #000; /* Optional: gives clean contrast edges */
+  background-color: #000;
   overflow: hidden;
 }
 
+/* Background video fills the screen */
+#bgvid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Polaroid overlay covering the screen */
 .polaroid-frame {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover; /* ensures it stretches edge-to-edge */
-  z-index: 1;
-  pointer-events: none; /* lets you click elements under it if needed */
+  object-fit: cover;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Centered Citywits logo */
+.citywits-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 1000px;
+  z-index: 3;
+  pointer-events: none;
 }
 
     .content-wrap {
