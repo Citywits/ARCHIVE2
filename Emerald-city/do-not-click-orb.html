@@ -1,0 +1,212 @@
+<!-- save as do-not-click-orb.html -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DO NOT CLICK THE ORB</title>
+<style>
+  :root{
+    --bg:#071010; --accent:#0fa06a; --gold:#d6b24a;
+    --glass: rgba(255,255,255,0.06);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  html,body{height:100%;margin:0;background: radial-gradient(1200px 600px at 10% 10%, rgba(6,30,22,0.6), var(--bg)); color:#e8efe8;}
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;text-align:center;}
+  h1{font-size:3rem;letter-spacing:0.06em;margin:0 0 .6rem;color:var(--gold);}
+  p.lead{margin:0 0 2rem;opacity:.9}
+  .orb-btn{
+    width:220px;height:220px;border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), rgba(255,255,255,0.02)),
+                conic-gradient(from 120deg, rgba(15,160,106,0.08), rgba(214,178,74,0.08));
+    border: 6px solid rgba(214,178,74,0.08);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 20px 50px rgba(0,0,0,0.6), inset 0 -8px 30px rgba(0,0,0,0.35);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .orb-btn:hover{transform: translateY(-6px) scale(1.02); box-shadow:0 30px 70px rgba(0,0,0,0.7)}
+  .orb-center{width:70%;height:70%;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+    color:var(--bg); font-weight:700; font-size:1rem; letter-spacing:.08em;}
+  .small{font-size:.95rem;margin-top:.9rem;opacity:.8}
+  .muted{color:rgba(232,239,232,0.6)}
+  .orb-glow{position:absolute;width:420px;height:420px;border-radius:50%;filter:blur(40px);opacity:.12;pointer-events:none}
+  .container{position:relative}
+  /* takeover */
+  .takeover{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg, rgba(0,0,0,0.85), rgba(0,0,0,0.95));backdrop-filter: blur(2px);
+    color:#8affc1;font-family:monospace;font-size:1.1rem;flex-direction:column;gap:1rem;padding:2rem;opacity:0;transform:scale(.98);
+    transition:opacity .45s ease, transform .45s ease;z-index:40;
+  }
+  .takeover.show{opacity:1;transform:scale(1);}
+  .takeover h2{margin:0;font-size:1.4rem;color:var(--accent)}
+  .fake-term{background:#03100d;border-radius:8px;padding:1rem 1.2rem;max-width:880px;box-shadow:0 10px 30px rgba(0,0,0,0.7)}
+  .dots{display:inline-block;height:1rem;width:1rem;border-radius:50%;margin-right:.4rem;background:rgba(255,255,255,0.08)}
+  .actions{display:flex;gap:.6rem;margin-top:.6rem}
+  .btn{padding:.6rem .9rem;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);cursor:pointer}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  /* confetti / orbs */
+  .orb-swarm{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+  .mini-orb{position:absolute;border-radius:50%;opacity:.95;transform:translate(-50%,-50%);will-change:transform,opacity}
+  /* silly footer */
+  footer{position:fixed;left:12px;bottom:12px;font-size:.8rem;color:rgba(232,239,232,.5)}
+  @keyframes floaty {from{transform:translateY(0)}50%{transform:translateY(-12px)}to{transform:translateY(0)}}
+  .orb-btn.anim{animation: floaty 1200ms ease-in-out infinite}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="container">
+      <div class="orb-glow" style="background:radial-gradient(circle at 30% 30%, rgba(15,160,106,0.4), transparent 40%);"></div>
+      <h1>PLEASE — DO NOT</h1>
+      <p class="lead muted">This page is obscure for a reason. You are not authorized. Please leave. Leave now.</p>
+
+      <div class="orb-btn" id="orb" title="Seriously. Don't.">
+        <div class="orb-center">DO NOT<br/><strong>CLICK</strong></div>
+      </div>
+
+      <p class="small muted">If you clicked, we both know why. The orb likes attention.</p>
+    </div>
+  </div>
+
+  <div class="takeover" id="takeover" aria-hidden="true">
+    <div class="fake-term" id="term">
+      <div style="display:flex;align-items:center;margin-bottom:.6rem">
+        <span class="dots" style="background:#f34"></span>
+        <span class="dots" style="background:#fb4"></span>
+        <span class="dots" style="background:#6f6"></span>
+        <strong style="margin-left:.7rem">SYSTEM — ORB</strong>
+      </div>
+      <div id="log" style="white-space:pre-wrap;line-height:1.35;max-height:260px;overflow:auto;">
+Initializing... 
+</div>
+      <div class="actions">
+        <button class="btn" id="calm">Calm the Orb</button>
+        <button class="btn ghost" id="redirect">Try to Leave</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="orb-swarm" id="swarm"></div>
+  <footer>this is an ancient gag — the mayor regrets nothing</footer>
+
+<script>
+  const orb = document.getElementById('orb');
+  const takeover = document.getElementById('takeover');
+  const log = document.getElementById('log');
+  const swarm = document.getElementById('swarm');
+  let clicks = 0;
+
+  function appendLog(txt){
+    log.textContent += txt + "\\n";
+    log.scrollTop = log.scrollHeight;
+  }
+
+  orb.addEventListener('click', async ()=>{
+    clicks++;
+    orb.classList.add('anim');
+    if(clicks === 1){
+      // first click: dramatic takeover sequence
+      takeover.classList.add('show');
+      takeover.setAttribute('aria-hidden','false');
+      appendLog('.. orbital presence detected');
+      await sleep(600);
+      appendLog('.. attempting polite negotiation');
+      await sleep(900);
+      appendLog('.. negotiation failed: orb insists on attention');
+      await sleep(750);
+      appendLog('… initiating minor visual contagion');
+      // spawn a few orbs
+      spawnOrbs(12);
+    } else if (clicks === 2){
+      // second click: escalate silly chaos
+      appendLog('.. escalation: assembly of tiny orbs');
+      spawnOrbs(40);
+      rainConfetti();
+      await sleep(600);
+      appendLog('.. orb amused. redirecting to absurdity.');
+      // show redirect suggestion
+      document.getElementById('redirect').textContent = 'Teleport me to nonsense';
+    } else {
+      appendLog('.. you are really committed. emergency option unlocked.');
+      document.getElementById('calm').textContent = 'Soothe the Orb (calm)';
+      // flood the page a bit
+      spawnOrbs(90);
+      rainConfetti(120);
+    }
+  });
+
+  document.getElementById('calm').addEventListener('click', ()=>{
+    appendLog('.. playing lullaby (silently) ... orb is contemplative.');
+    // clear some orbs
+    clearOrbs(60);
+    takeover.classList.remove('show');
+    takeover.setAttribute('aria-hidden','true');
+  });
+
+  document.getElementById('redirect').addEventListener('click', ()=>{
+    // playful "something dumb": open a new tab to an intentionally silly page (you can change this to any URL)
+    window.open('https://example.com/?citywits-orb=clicked','_blank');
+  });
+
+  function spawnOrbs(n=10){
+    for(let i=0;i<n;i++){
+      const el = document.createElement('div');
+      el.className = 'mini-orb';
+      const size = 8 + Math.random()*42;
+      el.style.width = el.style.height = size+'px';
+      const x = Math.random()*100; const y = Math.random()*100;
+      el.style.left = x + '%'; el.style.top = y + '%';
+      el.style.background = `radial-gradient(circle at 30% 30%, rgba(214,178,74,0.95), rgba(15,160,106,0.95))`;
+      el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.45), inset 0 -3px 8px rgba(0,0,0,0.2)';
+      swarm.appendChild(el);
+      // animate float (random)
+      const dx = (Math.random()-0.5)*30, dy = (Math.random()-0.5)*30, dur = 4000 + Math.random()*6000;
+      animateOrb(el, dx, dy, dur);
+      // auto-remove eventually
+      setTimeout(()=>{ el.style.transition='opacity .8s'; el.style.opacity='0'; setTimeout(()=>el.remove(),900); }, 4000 + Math.random()*8000);
+    }
+  }
+
+  function animateOrb(el, dx, dy, dur){
+    let start = null; const sx = parseFloat(el.style.left); const sy = parseFloat(el.style.top);
+    function frame(ts){
+      if(!start) start = ts;
+      const t = (ts-start)/dur;
+      if(t>1) return;
+      const nx = sx + dx * Math.sin(t*Math.PI*2);
+      const ny = sy + dy * Math.cos(t*Math.PI*2);
+      el.style.left = nx + '%'; el.style.top = ny + '%';
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function clearOrbs(limit=999){
+    const items = Array.from(swarm.children);
+    for(let i=0;i<Math.min(limit,items.length);i++){
+      items[i].remove();
+    }
+  }
+
+  function rainConfetti(count=60){
+    for(let i=0;i<count;i++){
+      const c = document.createElement('div');
+      c.style.position='fixed';
+      c.style.left = Math.random()*100+'%';
+      c.style.top = '-10%';
+      c.style.width='8px'; c.style.height='12px'; c.style.zIndex=50;
+      c.style.background = (Math.random()>0.5) ? 'rgba(214,178,74,0.95)' : 'rgba(15,160,106,0.95)';
+      c.style.transform = 'rotate('+(Math.random()*360)+'deg)';
+      c.style.opacity='0.95';
+      document.body.appendChild(c);
+      const fall = 2000 + Math.random()*2500;
+      c.animate([{transform:'translateY(0) rotate(0deg)'},{transform:'translateY(120vh) rotate(360deg)'}], {duration:fall, easing:'cubic-bezier(.2,.8,.2,1)'});
+      setTimeout(()=>c.remove(), fall+200);
+    }
+  }
+
+  function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+</script>
+</body>
+</html>
