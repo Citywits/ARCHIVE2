@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citywits Archive</title>
+
+  <!-- Fonts you gave me -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BBH+Sans+Bogle&family=Metal&family=Metal+Mania&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #eaeaea;
+      --muted: #b8b8b8;
+      --accent: #00d084;
+      --bg: #000000;
+      --max-width: 900px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "BBH Sans Bogle", system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    /* Background video */
+    #bgvid {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    /* Fullscreen polaroid overlay */
+    .polaroid-frame {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: center / contain no-repeat url("Emerald-city/assets/images/polaroid-background.png");
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Content that sits "inside" the polaroid window */
+    .page-content {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 8vh 4vw 10vh;
+    }
+
+    .logo {
+      display: block;
+      width: min(90%, 900px);
+      margin: 0 auto 3vh;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.75));
+    }
+
+    .welcome-text {
+      font-family: "Playfair Display", serif;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 auto 5vh;
+      max-width: 40rem;
+    }
+
+    .welcome-text strong {
+      font-family: "Metal Mania", system-ui;
+      font-size: 1.3rem;
+      letter-spacing: 0.03em;
+      color: var(--ink);
+    }
+
+    /* Welcome button image */
+    .welcome-button {
+      display: block;
+      width: min(80%, 520px);
+      margin: 0 auto 5vh;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.7));
+    }
+
+    .welcome-button:hover {
+      transform: scale(1.03);
+      filter: drop-shadow(0 6px 24px rgba(0,0,0,0.85));
+    }
+
+    /* Social icons row */
+    .social-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 3vh;
+    }
+
+    .social-row a {
+      display: inline-block;
+    }
+
+    .social-row img {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      object-fit: cover;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    .social-row img:hover {
+      transform: scale(1.12);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.85);
+    }
+
+    footer {
+      margin-top: 6vh;
+      font-size: 0.75rem;
+      color: #777;
+    }
+
+    @media (max-width: 600px) {
+      .page-content {
+        padding-top: 6vh;
+      }
+      .welcome-text {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background video (optional; will fail silently if file is missing) -->
+  <video autoplay muted loop playsinline id="bgvid">
+    <source src="Emerald-city/assets/video/cityliftoff.mp4" type="video/mp4">
+    <!-- If the video file/path is wrong, you'll just see a static black background. -->
+  </video>
+
+  <!-- Polaroid overlay -->
+  <div class="polaroid-frame"></div>
+
+  <!-- Main content inside the frame -->
+  <main class="page-content">
+    <!-- Header/logo image -->
+    <img
+      src="Emerald-city/assets/images/metal-writing-white.png"
+      alt="Citywits"
+      class="logo"
+    />
+
+    <p class="welcome-text">
+      Welcome to the City — a small, unstable universe held together by riffs,
+      feedback, and too much screen time. This is the <strong>Citywits</strong> archive:
+      weirdo music, technodystopian heartbreak, and whatever else survives the collapse.
+    </p>
+
+    <!-- Welcome-to-the-city button as an image -->
+    <a href="#">
+      <img
+        src="Emerald-city/assets/images/cwcitybanner.jpeg"
+        alt="Welcome to the City"
+        class="welcome-button"
+      />
+    </a>
+
+    <!-- Social links -->
+    <div class="social-row">
+      <a href="https://citywits.bandcamp.com" target="_blank" rel="noopener">
+        <img src="Emerald-city/assets/images/bandcamp.PNG" alt="Bandcamp" />
+      </a>
+      <a href="https://www.youtube.com/@citywits" target="_blank" rel="noopener">
+        <img src="Emerald-city/assets/images/youtube.PNG" alt="YouTube" />
+      </a>
+      <a href="https://www.instagram.com/citywits/" target="_blank" rel="noopener">
+        <img src="Emerald-city/assets/images/instagram.JPG" alt="Instagram" />
+      </a>
+      <a href="https://open.spotify.com/artist/2tB2LRfIx9ejZCEwAfiyDt" target="_blank" rel="noopener">
+        <img src="Emerald-city/assets/images/spotif.WEBP" alt="Spotify" />
+      </a>
+    </div>
+
+    <footer>© 2025 Citywits. All rights reserved.</footer>
+  </main>
+</body>
+</html>
