@@ -29,7 +29,7 @@
     .eyebrow{display:flex;align-items:center;gap:12px;color:var(--acid);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase}
     .pulse{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 0 rgba(185,255,74,.7);animation:pulse 2s infinite}
     @keyframes pulse{70%{box-shadow:0 0 0 12px rgba(185,255,74,0)}100%{box-shadow:0 0 0 0 rgba(185,255,74,0)}}
-    .logo{display:block;width:min(820px,92vw);height:auto;margin:18px 0 4px;filter:grayscale(1) contrast(100) invert(1);mix-blend-mode:screen}
+    .logo{display:block;margin:12px 0 8px;font-family:"Metal Mania",serif;font-size:clamp(5rem,15vw,12rem);line-height:.82;letter-spacing:-.035em;text-transform:uppercase;color:#fff;text-shadow:0 8px 28px #000}
     h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
     .lede{max-width:650px;margin:4px 0 30px;color:#c7d0cc;font-size:clamp(.95rem,1.5vw,1.15rem)}
     .actions{display:flex;flex-wrap:wrap;gap:12px}
@@ -72,7 +72,7 @@
       <section class="hero" id="top">
         <div class="eyebrow"><span class="pulse"></span>Transmission active</div>
         <h1>Citywits</h1>
-        <img class="logo" src="Emerald-city/assets/images/metal-writing-white.png" alt="Citywits">
+        <div class="logo" aria-hidden="true">Citywits</div>
         <p class="lede">Weirdo music, technodystopian heartbreak, and whatever else survives the collapse. Welcome to the City.</p>
         <div class="actions">
           <a class="button" href="https://citywits.bandcamp.com" target="_blank" rel="noopener">Play the music ↗</a>
