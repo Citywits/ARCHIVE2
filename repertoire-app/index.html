@@ -135,6 +135,10 @@
   .meter-label{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;}
 
   .links-row{display:flex;gap:14px;margin-top:10px;font-size:12.5px;}
+  .resource-finder{margin:14px 0;padding:13px;border:1px solid var(--line);border-radius:8px;background:rgba(232,163,61,.06);}
+  .resource-finder p{margin:0 0 10px;color:var(--text-dim);font-size:12px;line-height:1.45;}
+  .search-buttons{display:flex;gap:7px;flex-wrap:wrap;}
+  .saved-version{display:inline-block;margin-top:7px;font-size:10.5px;font-weight:700;letter-spacing:.45px;text-transform:uppercase;color:#6b4310;background:rgba(232,163,61,.2);padding:3px 7px;border-radius:4px;}
   .links-row a, .links-row button.linklike{
     color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);
     background:none;border-top:none;border-left:none;border-right:none;padding:0 0 1px;
@@ -481,10 +485,12 @@ function renderLibrary(){
             ${renderMeter(confidenceOf(song), song.id, true)}
             <div class="practice-meta">${dayLabel(song.lastPracticed)} · ${song.practiceCount||0} session${song.practiceCount===1?'':'s'}</div>
             <div class="links-row">
-              ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">Tab / chords ↗</a>` : ''}
+              ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">My chosen tab ↗</a>` : ''}
               ${song.lyricsUrl ? `<a href="${esc(song.lyricsUrl)}" target="_blank" rel="noopener">Lyrics online ↗</a>` : ''}
+              ${song.tutorialUrl ? `<a href="${esc(song.tutorialUrl)}" target="_blank" rel="noopener">Tutorial ↗</a>` : ''}
               ${song.lyrics ? `<button class="linklike" onclick="toggleLyrics('${song.id}')">${song.showLyrics? 'Hide lyrics' : 'Show lyrics'}</button>` : ''}
             </div>
+            ${song.versionNote ? `<span class="saved-version">${esc(song.versionNote)}</span>` : ''}
             ${song.showLyrics && song.lyrics ? `<div class="lyrics-box">${esc(song.lyrics)}</div>` : ''}
           </div>
           <div class="song-actions">
@@ -525,7 +531,7 @@ function openSongModal(id){
 
 function renderSongModal(){
   const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
-  const d = editing || {title:'',artist:'',type:'cover',confidence:20,tabUrl:'',lyricsUrl:'',lyrics:'',tags:[],key:''};
+  const d = editing || {title:'',artist:'',type:'cover',confidence:20,tabUrl:'',lyricsUrl:'',tutorialUrl:'',versionNote:'',lyrics:'',tags:[],key:''};
   const currentConfidence = editing ? confidenceOf(editing) : 20;
   return `
     <div class="overlay" onclick="if(event.target===this) closeModal()">
@@ -560,14 +566,30 @@ function renderSongModal(){
           <label>Tags (comma separated)</label>
           <input type="text" id="f-tags" value="${esc((d.tags||[]).join(', '))}" placeholder="rock, 90s, singalong">
         </div>
+        <div class="resource-finder">
+          <p><strong>Find your version.</strong> These open normal search results using the title and artist above. Compare them, then paste the winner into the matching field below.</p>
+          <div class="search-buttons">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('tabs')">Search tabs ↗</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('lyrics')">Search lyrics ↗</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('tutorial')">Search tutorials ↗</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('backing')">Search backing tracks ↗</button>
+          </div>
+        </div>
         <div class="field">
-          <label>Tab / chords link</label>
-          <input type="url" id="f-taburl" value="${esc(d.tabUrl)}" placeholder="https://...">
+          <label>Your chosen tab / chords link</label>
+          <input type="url" id="f-taburl" value="${esc(d.tabUrl)}" placeholder="Paste the correct version here">
+        </div>
+        <div class="field">
+          <label>Version note</label>
+          <input type="text" id="f-versionnote" value="${esc(d.versionNote||'')}" placeholder="CORRECT VERSION — capo 2">
         </div>
         <div class="field">
           <label>Online lyrics link</label>
           <input type="url" id="f-lyricsurl" value="${esc(d.lyricsUrl||'')}" placeholder="https://...">
         </div>
+        <div class="field">
+          <label>Tutorial / backing-track link</label>
+          <input type="url" id="f-tutorialurl" value="${esc(d.tutorialUrl||'')}" placeholder="https://youtube.com/..."></div>
         <div class="field">
           <label>Lyrics (optional)</label>
           <textarea id="f-lyrics" placeholder="Paste lyrics or chord chart here...">${esc(d.lyrics)}</textarea>
@@ -595,6 +617,19 @@ function setModalConfidence(v){
   document.getElementById('modal-strength-label').textContent = confidenceLabel(Number(v));
 }
 
+function searchResource(kind){
+  const title = document.getElementById('f-title').value.trim();
+  const artist = document.getElementById('f-artist').value.trim();
+  if(!title){ alert('Enter the song title first.'); return; }
+  const song = [artist, title].filter(Boolean).join(' ');
+  let url = '';
+  if(kind === 'tabs') url = `https://www.google.com/search?q=${encodeURIComponent(`site:ultimate-guitar.com ${song} chords tab`)}`;
+  if(kind === 'lyrics') url = `https://www.google.com/search?q=${encodeURIComponent(`${song} lyrics`)}`;
+  if(kind === 'tutorial') url = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${song} guitar tutorial`)}`;
+  if(kind === 'backing') url = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${song} backing track`)}`;
+  window.open(url, '_blank', 'noopener');
+}
+
 function saveSongForm(){
   const title = document.getElementById('f-title').value.trim();
   if(!title){ alert('Give the song a title.'); return; }
@@ -603,6 +638,8 @@ function saveSongForm(){
   const tags = document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const tabUrl = document.getElementById('f-taburl').value.trim();
   const lyricsUrl = document.getElementById('f-lyricsurl').value.trim();
+  const tutorialUrl = document.getElementById('f-tutorialurl').value.trim();
+  const versionNote = document.getElementById('f-versionnote').value.trim();
   const lyrics = document.getElementById('f-lyrics').value;
   const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
   const type = modalType || (editing ? editing.type : 'cover');
@@ -610,9 +647,9 @@ function saveSongForm(){
   const strength = Math.max(1, Math.ceil(confidence / 20));
 
   if(editing){
-    Object.assign(editing, {title, artist, key, tags, tabUrl, lyricsUrl, lyrics, type, confidence, strength});
+    Object.assign(editing, {title, artist, key, tags, tabUrl, lyricsUrl, tutorialUrl, versionNote, lyrics, type, confidence, strength});
   } else {
-    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyricsUrl, lyrics, type, confidence, strength, showLyrics:false});
+    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyricsUrl, tutorialUrl, versionNote, lyrics, type, confidence, strength, showLyrics:false});
   }
   saveSongs();
   modalType = null; modalConfidence = null;
