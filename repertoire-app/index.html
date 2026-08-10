@@ -162,6 +162,9 @@
   .stat span{display:block;margin-top:5px;color:var(--text-dim);font-size:10px;letter-spacing:.7px;text-transform:uppercase;}
   .practice-meta{font-size:11px;color:var(--ink-soft);margin-top:8px;}
   .needs-work{border-left-color:var(--red);}
+  .made-by{margin:55px 0 0;padding-top:18px;border-top:1px solid var(--line);text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+  .made-by a{color:var(--amber);text-decoration:none;}
+  .made-by a:hover,.made-by a:focus-visible{text-decoration:underline;}
 
   /* ---------- Modal ---------- */
   .overlay{
@@ -437,6 +440,8 @@ function render(){
   if(state.view === 'library') html += renderLibrary();
   else if(state.view === 'setlists') html += renderSetlists();
   else if(state.view === 'setlist-detail') html += renderSetlistDetail();
+
+  html += `<footer class="made-by">A <a href="../">Citywits</a> tool · Built by Citywits with Codex + Claude</footer>`;
 
   if(state.modal === 'song') html += renderSongModal();
   if(state.modal === 'setlist') html += renderSetlistModal();
