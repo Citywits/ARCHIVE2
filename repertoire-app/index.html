@@ -77,11 +77,11 @@
   .toolbar{
     display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;
   }
-  .toolbar input[type=text], .toolbar select{
+  .toolbar input[type=text], .toolbar input[type=search], .toolbar select{
     background:var(--panel);border:1px solid var(--line);color:var(--text);
     padding:9px 12px;border-radius:8px;font-family:'IBM Plex Sans';font-size:13px;
   }
-  .toolbar input[type=text]{flex:1;min-width:160px;}
+  .toolbar input[type=text], .toolbar input[type=search]{flex:1;min-width:160px;}
   .toolbar select{cursor:pointer;}
   .btn{
     border:none;cursor:pointer;font-family:'IBM Plex Sans';font-weight:600;font-size:13px;
@@ -394,6 +394,17 @@ function getFilteredSongs(){
   return list;
 }
 
+function filterSongCards(value){
+  state.search = value;
+  const query = value.trim().toLowerCase();
+  document.querySelectorAll('.song-card[data-search]').forEach(card => {
+    card.style.display = !query || card.dataset.search.includes(query) ? '' : 'none';
+  });
+  const visible = [...document.querySelectorAll('.song-card[data-search]')].some(card => card.style.display !== 'none');
+  const noResults = document.getElementById('search-empty');
+  if(noResults) noResults.style.display = visible ? 'none' : '';
+}
+
 function render(){
   const app = document.getElementById('app');
   if(state.loading){
@@ -433,7 +444,7 @@ function renderLibrary(){
   const songs = getFilteredSongs();
   let html = renderStats() + `
     <div class="toolbar">
-      <input type="text" placeholder="Search title, artist, or tag..." value="${esc(state.search)}" oninput="state.search=this.value;render()">
+      <input id="library-search" type="search" placeholder="Search title, artist, or tag..." value="${esc(state.search)}" oninput="filterSongCards(this.value)" autocomplete="off">
       <select onchange="state.typeFilter=this.value;render()">
         <option value="all" ${state.typeFilter==='all'?'selected':''}>All types</option>
         <option value="cover" ${state.typeFilter==='cover'?'selected':''}>Covers</option>
@@ -456,8 +467,9 @@ function renderLibrary(){
 
   songs.forEach(song => {
     const tags = (song.tags||[]).map(t=>`<span class="pill pill-tag">#${esc(t)}</span>`).join('');
+    const searchText = esc([song.title,song.artist,...(song.tags||[])].join(' ').toLowerCase());
     html += `
-      <div class="song-card type-${song.type} ${confidenceOf(song)<40?'needs-work':''}">
+      <div class="song-card type-${song.type} ${confidenceOf(song)<40?'needs-work':''}" data-search="${searchText}">
         <div class="song-row">
           <div class="song-title-block">
             <div class="song-title">${esc(song.title)}</div>
@@ -484,6 +496,8 @@ function renderLibrary(){
       </div>
     `;
   });
+
+  html += `<div class="empty" id="search-empty" style="display:none"><h3>No matches</h3>Try another title, artist, or tag.</div>`;
 
   return html;
 }
