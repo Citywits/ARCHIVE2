@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Repertoire">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&family=Metal+Mania&family=Yellowtail&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#181A20;
@@ -51,17 +51,18 @@
   }
   .brand{display:flex;align-items:baseline;gap:10px;}
   .brand h1{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:44px;
-    letter-spacing:2px;
+    font-family:'Metal Mania',serif;
+    font-size:48px;
+    font-weight:400;
+    letter-spacing:.5px;
     margin:0;
     color:var(--amber);
     line-height:1;
   }
   .brand span.sub{
-    font-size:12px;
-    letter-spacing:2px;
-    text-transform:uppercase;
+    font-family:'Yellowtail',cursive;
+    font-size:18px;
+    letter-spacing:.25px;
     color:var(--text-dim);
   }
   nav.tabs{display:flex;gap:6px;background:var(--panel);padding:4px;border-radius:999px;border:1px solid var(--line);}
@@ -110,7 +111,7 @@
   .song-card.type-original{border-left-color:var(--teal);}
   .song-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
   .song-title-block{min-width:200px;flex:1;}
-  .song-title{font-family:'Bebas Neue';font-size:24px;letter-spacing:.5px;line-height:1;}
+  .song-title{font-family:'Yellowtail',cursive;font-size:27px;letter-spacing:.15px;line-height:1;}
   .song-artist{font-size:13px;color:var(--ink-soft);margin-top:3px;}
   .song-meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
   .pill{
@@ -154,7 +155,7 @@
     text-align:center;color:var(--text-dim);padding:60px 20px;
     border:1px dashed var(--line);border-radius:12px;
   }
-  .empty h3{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;color:var(--text);margin:0 0 6px;}
+  .empty h3{font-family:'Yellowtail',cursive;font-size:29px;font-weight:400;color:var(--text);margin:0 0 6px;}
 
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px 14px;}
@@ -180,7 +181,7 @@
     background:var(--panel);border:1px solid var(--line);border-radius:12px;
     width:100%;max-width:560px;padding:24px;
   }
-  .modal h2{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;margin:0 0 18px;color:var(--amber);}
+  .modal h2{font-family:'Yellowtail',cursive;font-size:31px;font-weight:400;margin:0 0 18px;color:var(--amber);}
   .field{margin-bottom:14px;}
   .field label{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);margin-bottom:5px;font-weight:600;}
   .field input[type=text], .field input[type=url], .field textarea, .field select{
@@ -206,11 +207,11 @@
     align-items:center;flex-wrap:wrap;gap:10px;cursor:pointer;
   }
   .setlist-card:hover{border-color:var(--amber);}
-  .setlist-card h3{font-family:'Bebas Neue';font-size:22px;letter-spacing:.5px;margin:0;color:var(--text);}
+  .setlist-card h3{font-family:'Yellowtail',cursive;font-size:27px;font-weight:400;margin:0;color:var(--text);}
   .setlist-card .count{font-size:12px;color:var(--text-dim);margin-top:3px;}
 
   .setlist-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-  .setlist-detail-header h2{font-family:'Bebas Neue';font-size:32px;letter-spacing:1px;color:var(--amber);margin:0;}
+  .setlist-detail-header h2{font-family:'Yellowtail',cursive;font-size:37px;font-weight:400;color:var(--amber);margin:0;}
   .setlist-row{
     background:var(--paper);color:var(--ink);border-radius:8px;padding:10px 14px;
     display:flex;align-items:center;gap:12px;margin-bottom:8px;
@@ -490,7 +491,7 @@ function renderLibrary(){
         <div class="song-row">
           <div class="song-title-block">
             <div class="song-title">${esc(song.title)}</div>
-            <div class="song-artist">${esc(song.artist)}${song.key ? ' · Key of ' + esc(song.key) : ''}</div>
+            <div class="song-artist">${esc(song.artist)}${song.instrument ? ' · ' + esc(song.instrument.replace(/\b\w/g,c=>c.toUpperCase())) : ''}${song.key ? ' · Key of ' + esc(song.key) : ''}${song.tuning ? ' · ' + esc(song.tuning) : ''}</div>
             <div class="song-meta">
               <span class="pill pill-${song.type}">${song.type}</span>
               ${tags}
@@ -500,10 +501,8 @@ function renderLibrary(){
             <div class="links-row">
               ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">My chosen tab ↗</a>` : ''}
               ${song.lyricsUrl ? `<a href="${esc(song.lyricsUrl)}" target="_blank" rel="noopener">Lyrics online ↗</a>` : ''}
-              ${song.tutorialUrl ? `<a href="${esc(song.tutorialUrl)}" target="_blank" rel="noopener">Tutorial ↗</a>` : ''}
               ${song.lyrics ? `<button class="linklike" onclick="toggleLyrics('${song.id}')">${song.showLyrics? 'Hide lyrics' : 'Show lyrics'}</button>` : ''}
             </div>
-            ${song.versionNote ? `<span class="saved-version">${esc(song.versionNote)}</span>` : ''}
             ${song.showLyrics && song.lyrics ? `<div class="lyrics-box">${esc(song.lyrics)}</div>` : ''}
           </div>
           <div class="song-actions">
@@ -544,7 +543,7 @@ function openSongModal(id){
 
 function renderSongModal(){
   const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
-  const d = editing || {title:'',artist:'',type:'cover',confidence:20,tabUrl:'',lyricsUrl:'',tutorialUrl:'',versionNote:'',lyrics:'',tags:[],key:''};
+  const d = editing || {title:'',artist:'',type:'cover',confidence:20,tabUrl:'',lyricsUrl:'',instrument:'guitar',tuning:'',lyrics:'',tags:[],key:''};
   const currentConfidence = editing ? confidenceOf(editing) : 20;
   return `
     <div class="overlay" onclick="if(event.target===this) closeModal()">
@@ -579,30 +578,31 @@ function renderSongModal(){
           <label>Tags (comma separated)</label>
           <input type="text" id="f-tags" value="${esc((d.tags||[]).join(', '))}" placeholder="rock, 90s, singalong">
         </div>
-        <div class="resource-finder">
-          <p><strong>Find your version.</strong> These open normal search results using the title and artist above. Compare them, then paste the winner into the matching field below.</p>
-          <div class="search-buttons">
-            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('tabs')">Search tabs ↗</button>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('lyrics')">Search lyrics ↗</button>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('tutorial')">Search tutorials ↗</button>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('backing')">Search backing tracks ↗</button>
+        <div class="row2">
+          <div class="field">
+            <label>Instrument</label>
+            <select id="f-instrument">
+              ${['guitar','acoustic guitar','bass','piano','other'].map(v=>`<option value="${v}" ${(d.instrument||'guitar')===v?'selected':''}>${v.replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label>Capo / alternate tuning</label>
+            <input type="text" id="f-tuning" value="${esc(d.tuning||'')}" placeholder="Capo 2, Drop D, DADF#AD...">
           </div>
         </div>
+        <div class="resource-finder">
+          <p><strong>Choose your own correct version.</strong> Search, then long-press/right-click the result you want and choose <strong>Copy Link</strong>. Return here and tap <strong>Paste copied link</strong>.</p>
+        </div>
         <div class="field">
-          <label>Your chosen tab / chords link</label>
+          <label>Tab / chords link</label>
           <input type="url" id="f-taburl" value="${esc(d.tabUrl)}" placeholder="Paste the correct version here">
+          <div class="search-buttons" style="margin-top:7px"><button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('tabs')">Search tabs ↗</button><button type="button" class="btn btn-ghost btn-sm" onclick="pasteLink('f-taburl')">Paste copied link</button></div>
         </div>
         <div class="field">
-          <label>Version note</label>
-          <input type="text" id="f-versionnote" value="${esc(d.versionNote||'')}" placeholder="CORRECT VERSION — capo 2">
-        </div>
-        <div class="field">
-          <label>Online lyrics link</label>
+          <label>Lyrics link</label>
           <input type="url" id="f-lyricsurl" value="${esc(d.lyricsUrl||'')}" placeholder="https://...">
+          <div class="search-buttons" style="margin-top:7px"><button type="button" class="btn btn-ghost btn-sm" onclick="searchResource('lyrics')">Search lyrics ↗</button><button type="button" class="btn btn-ghost btn-sm" onclick="pasteLink('f-lyricsurl')">Paste copied link</button></div>
         </div>
-        <div class="field">
-          <label>Tutorial / backing-track link</label>
-          <input type="url" id="f-tutorialurl" value="${esc(d.tutorialUrl||'')}" placeholder="https://youtube.com/..."></div>
         <div class="field">
           <label>Lyrics (optional)</label>
           <textarea id="f-lyrics" placeholder="Paste lyrics or chord chart here...">${esc(d.lyrics)}</textarea>
@@ -635,12 +635,24 @@ function searchResource(kind){
   const artist = document.getElementById('f-artist').value.trim();
   if(!title){ alert('Enter the song title first.'); return; }
   const song = [artist, title].filter(Boolean).join(' ');
+  const instrument = document.getElementById('f-instrument')?.value || 'guitar';
   let url = '';
-  if(kind === 'tabs') url = `https://www.google.com/search?q=${encodeURIComponent(`site:ultimate-guitar.com ${song} chords tab`)}`;
+  if(kind === 'tabs') url = `https://www.google.com/search?q=${encodeURIComponent(`site:ultimate-guitar.com ${song} ${instrument} chords tab`)}`;
   if(kind === 'lyrics') url = `https://www.google.com/search?q=${encodeURIComponent(`${song} lyrics`)}`;
-  if(kind === 'tutorial') url = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${song} guitar tutorial`)}`;
-  if(kind === 'backing') url = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${song} backing track`)}`;
   window.open(url, '_blank', 'noopener');
+}
+
+async function pasteLink(fieldId){
+  const field = document.getElementById(fieldId);
+  try{
+    const text = await navigator.clipboard.readText();
+    if(!text) throw new Error('empty');
+    field.value = text.trim();
+    field.focus();
+  }catch(e){
+    const text = prompt('Paste the copied link here:');
+    if(text) field.value = text.trim();
+  }
 }
 
 function saveSongForm(){
@@ -651,8 +663,8 @@ function saveSongForm(){
   const tags = document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const tabUrl = document.getElementById('f-taburl').value.trim();
   const lyricsUrl = document.getElementById('f-lyricsurl').value.trim();
-  const tutorialUrl = document.getElementById('f-tutorialurl').value.trim();
-  const versionNote = document.getElementById('f-versionnote').value.trim();
+  const instrument = document.getElementById('f-instrument').value;
+  const tuning = document.getElementById('f-tuning').value.trim();
   const lyrics = document.getElementById('f-lyrics').value;
   const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
   const type = modalType || (editing ? editing.type : 'cover');
@@ -660,9 +672,9 @@ function saveSongForm(){
   const strength = Math.max(1, Math.ceil(confidence / 20));
 
   if(editing){
-    Object.assign(editing, {title, artist, key, tags, tabUrl, lyricsUrl, tutorialUrl, versionNote, lyrics, type, confidence, strength});
+    Object.assign(editing, {title, artist, key, tags, tabUrl, lyricsUrl, instrument, tuning, lyrics, type, confidence, strength});
   } else {
-    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyricsUrl, tutorialUrl, versionNote, lyrics, type, confidence, strength, showLyrics:false});
+    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyricsUrl, instrument, tuning, lyrics, type, confidence, strength, showLyrics:false});
   }
   saveSongs();
   modalType = null; modalConfidence = null;
