@@ -165,6 +165,10 @@
   .made-by{margin:55px 0 0;padding-top:18px;border-top:1px solid var(--line);text-align:center;color:var(--text-dim);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
   .made-by a{color:var(--amber);text-decoration:none;}
   .made-by a:hover,.made-by a:focus-visible{text-decoration:underline;}
+  .storage-note{margin:0 0 18px;padding:12px 14px;border:1px solid rgba(232,163,61,.55);border-radius:9px;background:rgba(232,163,61,.09);color:var(--text-dim);font-size:12px;line-height:1.5;}
+  .storage-note summary{cursor:pointer;color:var(--amber);font-weight:700;letter-spacing:.35px;}
+  .storage-note p{margin:8px 0 0;}
+  .storage-note strong{color:var(--text);}
 
   /* ---------- Modal ---------- */
   .overlay{
@@ -435,6 +439,10 @@ function render(){
         <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="importData(this)">
       </div>
     </header>
+    <details class="storage-note" open>
+      <summary>Before adding songs: install + protect your library</summary>
+      <p><strong>Your data lives only in this browser on this device.</strong> Add Repertoire to your home screen first and keep using the same browser/device. iPhone/iPad: Safari → Share → Add to Home Screen. Android/Chrome: browser menu → Install app. Installation does not replace a backup—use <strong>Backup</strong> before changing devices, browsers, or clearing site data.</p>
+    </details>
   `;
 
   if(state.view === 'library') html += renderLibrary();
