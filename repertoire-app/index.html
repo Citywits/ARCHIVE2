@@ -125,7 +125,7 @@
   /* Strength meter - signature element */
   .meter{display:flex;align-items:center;gap:10px;margin-top:10px;}
   .meter-bars{display:flex;gap:3px;}
-  .meter-bar{width:16px;height:9px;border-radius:2px;opacity:.22;cursor:pointer;}
+  .meter-bar{width:12px;height:9px;border-radius:2px;opacity:.22;cursor:pointer;}
   .meter-bar.filled{opacity:1;}
   .meter-bar:nth-child(1){background:var(--red);}
   .meter-bar:nth-child(2){background:var(--orange);}
@@ -232,7 +232,7 @@
 <div class="app" id="app"></div>
 
 <script>
-const STRENGTH_LABELS = ["", "Rough", "Shaky", "Solid", "Tight", "Locked In"];
+const STRENGTH_LABELS = ["Starting", "Learning", "Taking Shape", "Reliable", "Show Ready"];
 
 let state = {
   songs: [],
@@ -250,6 +250,9 @@ async function loadData(){
   try{
     const s = localStorage.getItem('repertoire_songs');
     state.songs = s ? JSON.parse(s) : [];
+    state.songs.forEach(song => {
+      if(typeof song.confidence !== 'number') song.confidence = Math.max(0, Math.min(100, (song.strength || 1) * 20));
+    });
   }catch(e){ state.songs = []; }
   try{
     const sl = localStorage.getItem('repertoire_setlists');
@@ -308,21 +311,34 @@ function importData(fileInput){
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function esc(s){ return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function renderMeter(strength, songId, editable){
+function confidenceOf(song){
+  return Math.max(0, Math.min(100, Number(song.confidence ?? ((song.strength || 1) * 20))));
+}
+function confidenceLabel(value){
+  if(value < 20) return STRENGTH_LABELS[0];
+  if(value < 40) return STRENGTH_LABELS[1];
+  if(value < 65) return STRENGTH_LABELS[2];
+  if(value < 85) return STRENGTH_LABELS[3];
+  return STRENGTH_LABELS[4];
+}
+function renderMeter(confidence, songId, editable){
+  confidence = Math.max(0, Math.min(100, Number(confidence || 0)));
   let bars = "";
-  for(let i=1;i<=5;i++){
-    bars += `<div class="meter-bar ${i<=strength?'filled':''}" ${editable?`onclick="setStrength('${songId}',${i})"`:''}></div>`;
+  for(let i=1;i<=10;i++){
+    const value = i * 10;
+    bars += `<div class="meter-bar ${value<=confidence?'filled':''}" ${editable?`onclick="setConfidence('${songId}',${value})"`:''} title="Set confidence to ${value}%"></div>`;
   }
   return `<div class="meter">
     <div class="meter-bars">${bars}</div>
-    <div class="meter-label">${STRENGTH_LABELS[strength] || "Unrated"}</div>
+    <div class="meter-label">${confidence}% · ${confidenceLabel(confidence)}</div>
   </div>`;
 }
 
-function setStrength(id, val){
+function setConfidence(id, val){
   const song = state.songs.find(s=>s.id===id);
   if(!song) return;
-  song.strength = val;
+  song.confidence = val;
+  song.strength = Math.max(1, Math.ceil(val / 20));
   song.updatedAt = new Date().toISOString();
   saveSongs();
   render();
@@ -347,8 +363,8 @@ function dayLabel(iso){
 
 function renderStats(){
   const total = state.songs.length;
-  const ready = state.songs.filter(s=>(s.strength||0)>=4).length;
-  const learning = state.songs.filter(s=>(s.strength||0)<4).length;
+  const ready = state.songs.filter(s=>confidenceOf(s)>=85).length;
+  const learning = state.songs.filter(s=>confidenceOf(s)<85).length;
   const practiced = state.songs.reduce((n,s)=>n+(s.practiceCount||0),0);
   return `<div class="stats">
     <div class="stat"><strong>${total}</strong><span>Total songs</span></div>
@@ -373,8 +389,8 @@ function getFilteredSongs(){
   }
   if(state.sort === "title") list.sort((a,b)=>a.title.localeCompare(b.title));
   else if(state.sort === "artist") list.sort((a,b)=>a.artist.localeCompare(b.artist));
-  else if(state.sort === "strength-desc") list.sort((a,b)=>b.strength-a.strength);
-  else if(state.sort === "strength-asc") list.sort((a,b)=>a.strength-b.strength);
+  else if(state.sort === "strength-desc") list.sort((a,b)=>confidenceOf(b)-confidenceOf(a));
+  else if(state.sort === "strength-asc") list.sort((a,b)=>confidenceOf(a)-confidenceOf(b));
   return list;
 }
 
@@ -441,7 +457,7 @@ function renderLibrary(){
   songs.forEach(song => {
     const tags = (song.tags||[]).map(t=>`<span class="pill pill-tag">#${esc(t)}</span>`).join('');
     html += `
-      <div class="song-card type-${song.type} ${(song.strength||0)<3?'needs-work':''}">
+      <div class="song-card type-${song.type} ${confidenceOf(song)<40?'needs-work':''}">
         <div class="song-row">
           <div class="song-title-block">
             <div class="song-title">${esc(song.title)}</div>
@@ -450,10 +466,11 @@ function renderLibrary(){
               <span class="pill pill-${song.type}">${song.type}</span>
               ${tags}
             </div>
-            ${renderMeter(song.strength, song.id, true)}
+            ${renderMeter(confidenceOf(song), song.id, true)}
             <div class="practice-meta">${dayLabel(song.lastPracticed)} · ${song.practiceCount||0} session${song.practiceCount===1?'':'s'}</div>
             <div class="links-row">
               ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">Tab / chords ↗</a>` : ''}
+              ${song.lyricsUrl ? `<a href="${esc(song.lyricsUrl)}" target="_blank" rel="noopener">Lyrics online ↗</a>` : ''}
               ${song.lyrics ? `<button class="linklike" onclick="toggleLyrics('${song.id}')">${song.showLyrics? 'Hide lyrics' : 'Show lyrics'}</button>` : ''}
             </div>
             ${song.showLyrics && song.lyrics ? `<div class="lyrics-box">${esc(song.lyrics)}</div>` : ''}
@@ -494,7 +511,8 @@ function openSongModal(id){
 
 function renderSongModal(){
   const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
-  const d = editing || {title:'',artist:'',type:'cover',strength:1,tabUrl:'',lyrics:'',tags:[],key:''};
+  const d = editing || {title:'',artist:'',type:'cover',confidence:20,tabUrl:'',lyricsUrl:'',lyrics:'',tags:[],key:''};
+  const currentConfidence = editing ? confidenceOf(editing) : 20;
   return `
     <div class="overlay" onclick="if(event.target===this) closeModal()">
       <div class="modal">
@@ -521,11 +539,8 @@ function renderSongModal(){
           </div>
         </div>
         <div class="field">
-          <label>How well do you know it?</label>
-          ${renderMeter(d.strength, 'modal', false).replace(/onclick="[^"]*"/g,'').replace(/meter-bar /g, 'meter-bar clickable ')}
-          <div id="modal-meter" style="margin-top:6px;">
-            ${[1,2,3,4,5].map(i=>`<button type="button" class="btn-sm btn-ghost" style="margin-right:4px;${d.strength===i?'border-color:var(--amber);color:var(--amber);':''}" onclick="setModalStrength(${i})">${i}</button>`).join('')} <span id="modal-strength-label" style="font-size:12px;color:var(--text-dim);">${STRENGTH_LABELS[d.strength]}</span>
-          </div>
+          <label>Confidence: <strong id="confidence-value">${currentConfidence}%</strong> · <span id="modal-strength-label">${confidenceLabel(currentConfidence)}</span></label>
+          <input type="range" id="f-confidence" min="0" max="100" step="5" value="${currentConfidence}" oninput="setModalConfidence(this.value)" style="width:100%;accent-color:var(--amber)">
         </div>
         <div class="field">
           <label>Tags (comma separated)</label>
@@ -534,6 +549,10 @@ function renderSongModal(){
         <div class="field">
           <label>Tab / chords link</label>
           <input type="url" id="f-taburl" value="${esc(d.tabUrl)}" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Online lyrics link</label>
+          <input type="url" id="f-lyricsurl" value="${esc(d.lyricsUrl||'')}" placeholder="https://...">
         </div>
         <div class="field">
           <label>Lyrics (optional)</label>
@@ -549,18 +568,17 @@ function renderSongModal(){
 }
 
 let modalType = null;
-let modalStrength = null;
+let modalConfidence = null;
 
 function setModalType(t){
   modalType = t;
   document.getElementById('btn-cover').className = t==='cover' ? 'active-cover' : '';
   document.getElementById('btn-original').className = t==='original' ? 'active-original' : '';
 }
-function setModalStrength(v){
-  modalStrength = v;
-  document.getElementById('modal-strength-label').textContent = STRENGTH_LABELS[v];
-  const btns = document.querySelectorAll('#modal-meter .btn-sm');
-  btns.forEach((b,i)=>{ b.style.borderColor = (i+1===v) ? 'var(--amber)' : ''; b.style.color = (i+1===v) ? 'var(--amber)' : ''; });
+function setModalConfidence(v){
+  modalConfidence = Number(v);
+  document.getElementById('confidence-value').textContent = `${v}%`;
+  document.getElementById('modal-strength-label').textContent = confidenceLabel(Number(v));
 }
 
 function saveSongForm(){
@@ -570,25 +588,27 @@ function saveSongForm(){
   const key = document.getElementById('f-key').value.trim();
   const tags = document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const tabUrl = document.getElementById('f-taburl').value.trim();
+  const lyricsUrl = document.getElementById('f-lyricsurl').value.trim();
   const lyrics = document.getElementById('f-lyrics').value;
   const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
   const type = modalType || (editing ? editing.type : 'cover');
-  const strength = modalStrength || (editing ? editing.strength : 1);
+  const confidence = modalConfidence ?? (editing ? confidenceOf(editing) : 20);
+  const strength = Math.max(1, Math.ceil(confidence / 20));
 
   if(editing){
-    Object.assign(editing, {title, artist, key, tags, tabUrl, lyrics, type, strength});
+    Object.assign(editing, {title, artist, key, tags, tabUrl, lyricsUrl, lyrics, type, confidence, strength});
   } else {
-    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyrics, type, strength, showLyrics:false});
+    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyricsUrl, lyrics, type, confidence, strength, showLyrics:false});
   }
   saveSongs();
-  modalType = null; modalStrength = null;
+  modalType = null; modalConfidence = null;
   closeModal();
 }
 
 function closeModal(){
   state.modal = null;
   state.editingSongId = null;
-  modalType = null; modalStrength = null;
+  modalType = null; modalConfidence = null;
   render();
 }
 
@@ -712,7 +732,7 @@ function renderSetlistDetail(){
             <div class="t">${esc(song.title)}</div>
             <div class="a">${esc(song.artist)}</div>
           </div>
-          ${renderMeter(song.strength, song.id, false)}
+          ${renderMeter(confidenceOf(song), song.id, false)}
           <div class="song-actions">
             <button class="btn-icon" onclick="moveSong('${sl.id}',${idx},-1)" ${idx===0?'disabled style="opacity:.3"':''}>&uarr;</button>
             <button class="btn-icon" onclick="moveSong('${sl.id}',${idx},1)" ${idx===sl.songIds.length-1?'disabled style="opacity:.3"':''}>&darr;</button>
