@@ -1,5 +1,5 @@
-const CACHE_NAME = 'repertoire-v8';
-const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'repertoire-v9';
+const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png?v=2', './icon-512.png?v=2'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
   self.skipWaiting();
