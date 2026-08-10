@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repertoire</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#181A20">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Repertoire">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#181A20;
+    --panel:#1F222A;
+    --paper:#ECE4D3;
+    --paper-line:#D8CDB4;
+    --ink:#26221B;
+    --ink-soft:#5B5346;
+    --amber:#E8A33D;
+    --amber-ink:#3D2A08;
+    --red:#C2453A;
+    --orange:#D9822B;
+    --teal:#3E7C74;
+    --green:#4F8F63;
+    --line:#33363F;
+    --line-soft:#2A2D35;
+    --text:#EDEAE1;
+    --text-dim:#9A9EA6;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:920px;margin:0 auto;padding:28px 20px 80px;}
+
+  /* ---------- Header ---------- */
+  header.top{
+    display:flex;align-items:flex-end;justify-content:space-between;
+    margin-bottom:22px;flex-wrap:wrap;gap:14px;
+    border-bottom:2px solid var(--line);
+    padding-bottom:16px;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:44px;
+    letter-spacing:2px;
+    margin:0;
+    color:var(--amber);
+    line-height:1;
+  }
+  .brand span.sub{
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  nav.tabs{display:flex;gap:6px;background:var(--panel);padding:4px;border-radius:999px;border:1px solid var(--line);}
+  nav.tabs button{
+    border:none;background:transparent;color:var(--text-dim);
+    font-family:'IBM Plex Sans';font-weight:600;font-size:13px;
+    padding:8px 18px;border-radius:999px;cursor:pointer;
+    letter-spacing:.3px;
+  }
+  nav.tabs button.active{background:var(--amber);color:var(--amber-ink);}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;
+  }
+  .toolbar input[type=text], .toolbar select{
+    background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:9px 12px;border-radius:8px;font-family:'IBM Plex Sans';font-size:13px;
+  }
+  .toolbar input[type=text]{flex:1;min-width:160px;}
+  .toolbar select{cursor:pointer;}
+  .btn{
+    border:none;cursor:pointer;font-family:'IBM Plex Sans';font-weight:600;font-size:13px;
+    padding:9px 16px;border-radius:8px;letter-spacing:.2px;
+  }
+  .btn-primary{background:var(--amber);color:var(--amber-ink);}
+  .btn-primary:hover{background:#f0ad4e;}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--text-dim);}
+  .btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
+  .btn-danger:hover{background:rgba(194,69,58,.12);}
+  .btn-sm{padding:6px 10px;font-size:12px;border-radius:6px;}
+  .btn-icon{
+    border:none;background:transparent;color:var(--text-dim);cursor:pointer;
+    padding:4px 8px;font-size:14px;border-radius:6px;
+  }
+  .btn-icon:hover{background:var(--line-soft);color:var(--text);}
+
+  /* ---------- Song cards (setlist-paper look) ---------- */
+  .song-card{
+    background:var(--paper);color:var(--ink);
+    border-radius:8px;padding:14px 16px;margin-bottom:10px;
+    position:relative;
+    border-left:5px solid var(--amber);
+  }
+  .song-card.type-original{border-left-color:var(--teal);}
+  .song-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+  .song-title-block{min-width:200px;flex:1;}
+  .song-title{font-family:'Bebas Neue';font-size:24px;letter-spacing:.5px;line-height:1;}
+  .song-artist{font-size:13px;color:var(--ink-soft);margin-top:3px;}
+  .song-meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .pill{
+    font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;
+    padding:3px 8px;border-radius:999px;font-weight:600;
+  }
+  .pill-cover{background:rgba(232,163,61,.22);color:#7A4C0C;}
+  .pill-original{background:rgba(62,124,116,.2);color:#1F4B44;}
+  .pill-tag{background:rgba(38,34,27,.08);color:var(--ink-soft);}
+  .song-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+
+  /* Strength meter - signature element */
+  .meter{display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .meter-bars{display:flex;gap:3px;}
+  .meter-bar{width:16px;height:9px;border-radius:2px;opacity:.22;cursor:pointer;}
+  .meter-bar.filled{opacity:1;}
+  .meter-bar:nth-child(1){background:var(--red);}
+  .meter-bar:nth-child(2){background:var(--orange);}
+  .meter-bar:nth-child(3){background:var(--amber);}
+  .meter-bar:nth-child(4){background:var(--teal);}
+  .meter-bar:nth-child(5){background:var(--green);}
+  .meter-label{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;}
+
+  .links-row{display:flex;gap:14px;margin-top:10px;font-size:12.5px;}
+  .links-row a, .links-row button.linklike{
+    color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);
+    background:none;border-top:none;border-left:none;border-right:none;padding:0 0 1px;
+    cursor:pointer;font-family:'IBM Plex Sans';font-weight:600;font-size:12.5px;
+  }
+  .lyrics-box{
+    margin-top:12px;background:rgba(38,34,27,.05);border-radius:6px;padding:12px 14px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;white-space:pre-wrap;
+    max-height:260px;overflow-y:auto;line-height:1.6;
+  }
+
+  .empty{
+    text-align:center;color:var(--text-dim);padding:60px 20px;
+    border:1px dashed var(--line);border-radius:12px;
+  }
+  .empty h3{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;color:var(--text);margin:0 0 6px;}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(10,10,12,.6);
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:40px 16px;overflow-y:auto;z-index:50;
+  }
+  .modal{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    width:100%;max-width:560px;padding:24px;
+  }
+  .modal h2{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;margin:0 0 18px;color:var(--amber);}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);margin-bottom:5px;font-weight:600;}
+  .field input[type=text], .field input[type=url], .field textarea, .field select{
+    width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);
+    padding:9px 11px;border-radius:7px;font-family:'IBM Plex Sans';font-size:13.5px;
+  }
+  .field textarea{font-family:'IBM Plex Mono',monospace;font-size:12.5px;min-height:120px;resize:vertical;}
+  .type-toggle{display:flex;gap:8px;}
+  .type-toggle button{
+    flex:1;padding:9px;border-radius:7px;border:1px solid var(--line);background:var(--bg);
+    color:var(--text-dim);cursor:pointer;font-weight:600;font-size:13px;
+  }
+  .type-toggle button.active-cover{background:rgba(232,163,61,.18);border-color:var(--amber);color:var(--amber);}
+  .type-toggle button.active-original{background:rgba(62,124,116,.18);border-color:var(--teal);color:var(--teal);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+  .row2{display:flex;gap:12px;}
+  .row2>div{flex:1;}
+
+  /* ---------- Setlists ---------- */
+  .setlist-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;
+    align-items:center;flex-wrap:wrap;gap:10px;cursor:pointer;
+  }
+  .setlist-card:hover{border-color:var(--amber);}
+  .setlist-card h3{font-family:'Bebas Neue';font-size:22px;letter-spacing:.5px;margin:0;color:var(--text);}
+  .setlist-card .count{font-size:12px;color:var(--text-dim);margin-top:3px;}
+
+  .setlist-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .setlist-detail-header h2{font-family:'Bebas Neue';font-size:32px;letter-spacing:1px;color:var(--amber);margin:0;}
+  .setlist-row{
+    background:var(--paper);color:var(--ink);border-radius:8px;padding:10px 14px;
+    display:flex;align-items:center;gap:12px;margin-bottom:8px;
+  }
+  .setlist-row .num{font-family:'Bebas Neue';font-size:20px;color:var(--ink-soft);width:26px;}
+  .setlist-row .info{flex:1;min-width:0;}
+  .setlist-row .info .t{font-weight:600;font-size:14.5px;}
+  .setlist-row .info .a{font-size:12px;color:var(--ink-soft);}
+  .add-song-row{display:flex;gap:8px;margin-top:16px;}
+  .add-song-row select{flex:1;}
+
+  @media print{
+    body{background:#fff;color:#000;}
+    header.top, .toolbar, .setlist-detail-header .btn, .add-song-row, .btn-icon, nav.tabs, .app > .toolbar{display:none !important;}
+    .setlist-row{background:#fff;border:1px solid #ccc;color:#000;}
+    .setlist-detail-header h2{color:#000;}
+  }
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const STRENGTH_LABELS = ["", "Rough", "Shaky", "Solid", "Tight", "Locked In"];
+
+let state = {
+  songs: [],
+  setlists: [],
+  view: "library",
+  activeSetlistId: null,
+  search: "",
+  typeFilter: "all",
+  sort: "title",
+  modal: null,
+  loading: true
+};
+
+async function loadData(){
+  try{
+    const s = localStorage.getItem('repertoire_songs');
+    state.songs = s ? JSON.parse(s) : [];
+  }catch(e){ state.songs = []; }
+  try{
+    const sl = localStorage.getItem('repertoire_setlists');
+    state.setlists = sl ? JSON.parse(sl) : [];
+  }catch(e){ state.setlists = []; }
+  state.loading = false;
+  render();
+}
+
+async function saveSongs(){
+  try{ localStorage.setItem('repertoire_songs', JSON.stringify(state.songs)); }
+  catch(e){ console.error('save songs failed', e); alert('Could not save — your browser storage may be full.'); }
+}
+async function saveSetlists(){
+  try{ localStorage.setItem('repertoire_setlists', JSON.stringify(state.setlists)); }
+  catch(e){ console.error('save setlists failed', e); alert('Could not save — your browser storage may be full.'); }
+}
+
+function exportData(){
+  const data = {songs: state.songs, setlists: state.setlists, exportedAt: new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `repertoire-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function triggerImport(){
+  document.getElementById('import-file-input').click();
+}
+
+function importData(fileInput){
+  const file = fileInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data.songs) || !Array.isArray(data.setlists)) throw new Error('bad format');
+      if(state.songs.length && !confirm('This will replace your current library and setlists with the imported backup. Continue?')) return;
+      state.songs = data.songs;
+      state.setlists = data.setlists;
+      saveSongs();
+      saveSetlists();
+      render();
+    }catch(err){
+      alert("Couldn't read that file — make sure it's a Repertoire backup JSON file.");
+    }
+  };
+  reader.readAsText(file);
+  fileInput.value = '';
+}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(s){ return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderMeter(strength, songId, editable){
+  let bars = "";
+  for(let i=1;i<=5;i++){
+    bars += `<div class="meter-bar ${i<=strength?'filled':''}" ${editable?`onclick="setStrength('${songId}',${i})"`:''}></div>`;
+  }
+  return `<div class="meter">
+    <div class="meter-bars">${bars}</div>
+    <div class="meter-label">${STRENGTH_LABELS[strength] || "Unrated"}</div>
+  </div>`;
+}
+
+function setStrength(id, val){
+  const song = state.songs.find(s=>s.id===id);
+  if(!song) return;
+  song.strength = song.strength === val ? val : val;
+  saveSongs();
+  render();
+}
+
+function getFilteredSongs(){
+  let list = [...state.songs];
+  if(state.search.trim()){
+    const q = state.search.toLowerCase();
+    list = list.filter(s =>
+      s.title.toLowerCase().includes(q) ||
+      s.artist.toLowerCase().includes(q) ||
+      (s.tags||[]).some(t=>t.toLowerCase().includes(q))
+    );
+  }
+  if(state.typeFilter !== "all"){
+    list = list.filter(s => s.type === state.typeFilter);
+  }
+  if(state.sort === "title") list.sort((a,b)=>a.title.localeCompare(b.title));
+  else if(state.sort === "artist") list.sort((a,b)=>a.artist.localeCompare(b.artist));
+  else if(state.sort === "strength-desc") list.sort((a,b)=>b.strength-a.strength);
+  else if(state.sort === "strength-asc") list.sort((a,b)=>a.strength-b.strength);
+  return list;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if(state.loading){
+    app.innerHTML = `<div class="empty">Loading your repertoire…</div>`;
+    return;
+  }
+
+  let html = `
+    <header class="top">
+      <div class="brand">
+        <h1>REPERTOIRE</h1>
+        <span class="sub">songs you can play, on command</span>
+      </div>
+      <nav class="tabs">
+        <button class="${state.view==='library'?'active':''}" onclick="switchView('library')">Library</button>
+        <button class="${state.view==='setlists'||state.view==='setlist-detail'?'active':''}" onclick="switchView('setlists')">Setlists</button>
+      </nav>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Download a backup of your data">Backup</button>
+        <button class="btn btn-ghost btn-sm" onclick="triggerImport()" title="Restore from a backup file">Restore</button>
+        <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="importData(this)">
+      </div>
+    </header>
+  `;
+
+  if(state.view === 'library') html += renderLibrary();
+  else if(state.view === 'setlists') html += renderSetlists();
+  else if(state.view === 'setlist-detail') html += renderSetlistDetail();
+
+  if(state.modal === 'song') html += renderSongModal();
+  if(state.modal === 'setlist') html += renderSetlistModal();
+
+  app.innerHTML = html;
+}
+
+function renderLibrary(){
+  const songs = getFilteredSongs();
+  let html = `
+    <div class="toolbar">
+      <input type="text" placeholder="Search title, artist, or tag..." value="${esc(state.search)}" oninput="state.search=this.value;render()">
+      <select onchange="state.typeFilter=this.value;render()">
+        <option value="all" ${state.typeFilter==='all'?'selected':''}>All types</option>
+        <option value="cover" ${state.typeFilter==='cover'?'selected':''}>Covers</option>
+        <option value="original" ${state.typeFilter==='original'?'selected':''}>Originals</option>
+      </select>
+      <select onchange="state.sort=this.value;render()">
+        <option value="title" ${state.sort==='title'?'selected':''}>Sort: Title</option>
+        <option value="artist" ${state.sort==='artist'?'selected':''}>Sort: Artist</option>
+        <option value="strength-desc" ${state.sort==='strength-desc'?'selected':''}>Sort: Strongest first</option>
+        <option value="strength-asc" ${state.sort==='strength-asc'?'selected':''}>Sort: Weakest first</option>
+      </select>
+      <button class="btn btn-primary" onclick="openSongModal()">+ Add song</button>
+    </div>
+  `;
+
+  if(songs.length === 0){
+    html += `<div class="empty"><h3>No songs yet</h3>Add the first song you can play — cover or original.</div>`;
+    return html;
+  }
+
+  songs.forEach(song => {
+    const tags = (song.tags||[]).map(t=>`<span class="pill pill-tag">#${esc(t)}</span>`).join('');
+    html += `
+      <div class="song-card type-${song.type}">
+        <div class="song-row">
+          <div class="song-title-block">
+            <div class="song-title">${esc(song.title)}</div>
+            <div class="song-artist">${esc(song.artist)}${song.key ? ' · Key of ' + esc(song.key) : ''}</div>
+            <div class="song-meta">
+              <span class="pill pill-${song.type}">${song.type}</span>
+              ${tags}
+            </div>
+            ${renderMeter(song.strength, song.id, true)}
+            <div class="links-row">
+              ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">Tab / chords ↗</a>` : ''}
+              ${song.lyrics ? `<button class="linklike" onclick="toggleLyrics('${song.id}')">${song.showLyrics? 'Hide lyrics' : 'Show lyrics'}</button>` : ''}
+            </div>
+            ${song.showLyrics && song.lyrics ? `<div class="lyrics-box">${esc(song.lyrics)}</div>` : ''}
+          </div>
+          <div class="song-actions">
+            <button class="btn-icon" onclick="openSongModal('${song.id}')" title="Edit">Edit</button>
+            <button class="btn-icon" onclick="deleteSong('${song.id}')" title="Delete">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
+function toggleLyrics(id){
+  const song = state.songs.find(s=>s.id===id);
+  song.showLyrics = !song.showLyrics;
+  render();
+}
+
+function deleteSong(id){
+  if(!confirm('Remove this song from your repertoire?')) return;
+  state.songs = state.songs.filter(s=>s.id!==id);
+  state.setlists.forEach(sl => sl.songIds = sl.songIds.filter(sid=>sid!==id));
+  saveSongs();
+  saveSetlists();
+  render();
+}
+
+function openSongModal(id){
+  state.modal = 'song';
+  state.editingSongId = id || null;
+  render();
+}
+
+function renderSongModal(){
+  const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
+  const d = editing || {title:'',artist:'',type:'cover',strength:1,tabUrl:'',lyrics:'',tags:[],key:''};
+  return `
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <h2>${editing ? 'Edit song' : 'Add a song'}</h2>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" id="f-title" value="${esc(d.title)}" placeholder="Wonderwall">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Artist</label>
+            <input type="text" id="f-artist" value="${esc(d.artist)}" placeholder="Oasis">
+          </div>
+          <div class="field">
+            <label>Key (optional)</label>
+            <input type="text" id="f-key" value="${esc(d.key)}" placeholder="G">
+          </div>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <div class="type-toggle">
+            <button type="button" id="btn-cover" class="${d.type==='cover'?'active-cover':''}" onclick="setModalType('cover')">Cover</button>
+            <button type="button" id="btn-original" class="${d.type==='original'?'active-original':''}" onclick="setModalType('original')">Original</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>How well do you know it?</label>
+          ${renderMeter(d.strength, 'modal', false).replace(/onclick="[^"]*"/g,'').replace(/meter-bar /g, 'meter-bar clickable ')}
+          <div id="modal-meter" style="margin-top:6px;">
+            ${[1,2,3,4,5].map(i=>`<button type="button" class="btn-sm btn-ghost" style="margin-right:4px;${d.strength===i?'border-color:var(--amber);color:var(--amber);':''}" onclick="setModalStrength(${i})">${i}</button>`).join('')} <span id="modal-strength-label" style="font-size:12px;color:var(--text-dim);">${STRENGTH_LABELS[d.strength]}</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tags (comma separated)</label>
+          <input type="text" id="f-tags" value="${esc((d.tags||[]).join(', '))}" placeholder="rock, 90s, singalong">
+        </div>
+        <div class="field">
+          <label>Tab / chords link</label>
+          <input type="url" id="f-taburl" value="${esc(d.tabUrl)}" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Lyrics (optional)</label>
+          <textarea id="f-lyrics" placeholder="Paste lyrics or chord chart here...">${esc(d.lyrics)}</textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveSongForm()">Save song</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+let modalType = null;
+let modalStrength = null;
+
+function setModalType(t){
+  modalType = t;
+  document.getElementById('btn-cover').className = t==='cover' ? 'active-cover' : '';
+  document.getElementById('btn-original').className = t==='original' ? 'active-original' : '';
+}
+function setModalStrength(v){
+  modalStrength = v;
+  document.getElementById('modal-strength-label').textContent = STRENGTH_LABELS[v];
+  const btns = document.querySelectorAll('#modal-meter .btn-sm');
+  btns.forEach((b,i)=>{ b.style.borderColor = (i+1===v) ? 'var(--amber)' : ''; b.style.color = (i+1===v) ? 'var(--amber)' : ''; });
+}
+
+function saveSongForm(){
+  const title = document.getElementById('f-title').value.trim();
+  if(!title){ alert('Give the song a title.'); return; }
+  const artist = document.getElementById('f-artist').value.trim();
+  const key = document.getElementById('f-key').value.trim();
+  const tags = document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const tabUrl = document.getElementById('f-taburl').value.trim();
+  const lyrics = document.getElementById('f-lyrics').value;
+  const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
+  const type = modalType || (editing ? editing.type : 'cover');
+  const strength = modalStrength || (editing ? editing.strength : 1);
+
+  if(editing){
+    Object.assign(editing, {title, artist, key, tags, tabUrl, lyrics, type, strength});
+  } else {
+    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyrics, type, strength, showLyrics:false});
+  }
+  saveSongs();
+  modalType = null; modalStrength = null;
+  closeModal();
+}
+
+function closeModal(){
+  state.modal = null;
+  state.editingSongId = null;
+  modalType = null; modalStrength = null;
+  render();
+}
+
+/* ---------- Setlists ---------- */
+
+function switchView(v){
+  state.view = v;
+  state.activeSetlistId = null;
+  render();
+}
+
+function renderSetlists(){
+  let html = `
+    <div class="toolbar">
+      <div style="flex:1;"></div>
+      <button class="btn btn-primary" onclick="openSetlistModal()">+ New setlist</button>
+    </div>
+  `;
+  if(state.setlists.length === 0){
+    html += `<div class="empty"><h3>No setlists yet</h3>Group songs together for a show, rehearsal, or open mic.</div>`;
+    return html;
+  }
+  state.setlists.forEach(sl => {
+    html += `
+      <div class="setlist-card" onclick="openSetlist('${sl.id}')">
+        <div>
+          <h3>${esc(sl.name)}</h3>
+          <div class="count">${sl.songIds.length} song${sl.songIds.length!==1?'s':''}</div>
+        </div>
+        <div class="song-actions" onclick="event.stopPropagation()">
+          <button class="btn-icon" onclick="deleteSetlist('${sl.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+  return html;
+}
+
+function openSetlistModal(){
+  state.modal = 'setlist';
+  render();
+}
+
+function renderSetlistModal(){
+  return `
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal" style="max-width:420px;">
+        <h2>New setlist</h2>
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="f-setlist-name" placeholder="Sarah's Wedding — June">
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="createSetlist()">Create</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function createSetlist(){
+  const name = document.getElementById('f-setlist-name').value.trim();
+  if(!name){ alert('Give the setlist a name.'); return; }
+  const sl = {id: uid(), name, songIds: []};
+  state.setlists.push(sl);
+  saveSetlists();
+  state.modal = null;
+  state.view = 'setlist-detail';
+  state.activeSetlistId = sl.id;
+  render();
+}
+
+function deleteSetlist(id){
+  if(!confirm('Delete this setlist? Songs stay in your library.')) return;
+  state.setlists = state.setlists.filter(s=>s.id!==id);
+  saveSetlists();
+  render();
+}
+
+function openSetlist(id){
+  state.view = 'setlist-detail';
+  state.activeSetlistId = id;
+  render();
+}
+
+function renderSetlistDetail(){
+  const sl = state.setlists.find(s=>s.id===state.activeSetlistId);
+  if(!sl){ state.view='setlists'; return renderSetlists(); }
+
+  let html = `
+    <div class="setlist-detail-header">
+      <div>
+        <button class="btn btn-ghost btn-sm" onclick="switchView('setlists')">&larr; Back</button>
+      </div>
+      <h2>${esc(sl.name)}</h2>
+      <button class="btn btn-ghost" onclick="window.print()">Print</button>
+    </div>
+  `;
+
+  if(sl.songIds.length === 0){
+    html += `<div class="empty"><h3>Empty setlist</h3>Add songs from your library below.</div>`;
+  } else {
+    sl.songIds.forEach((sid, idx) => {
+      const song = state.songs.find(s=>s.id===sid);
+      if(!song) return;
+      html += `
+        <div class="setlist-row">
+          <div class="num">${idx+1}</div>
+          <div class="info">
+            <div class="t">${esc(song.title)}</div>
+            <div class="a">${esc(song.artist)}</div>
+          </div>
+          ${renderMeter(song.strength, song.id, false)}
+          <div class="song-actions">
+            <button class="btn-icon" onclick="moveSong('${sl.id}',${idx},-1)" ${idx===0?'disabled style="opacity:.3"':''}>&uarr;</button>
+            <button class="btn-icon" onclick="moveSong('${sl.id}',${idx},1)" ${idx===sl.songIds.length-1?'disabled style="opacity:.3"':''}>&darr;</button>
+            <button class="btn-icon" onclick="removeFromSetlist('${sl.id}','${sid}')">Remove</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  const available = state.songs.filter(s => !sl.songIds.includes(s.id));
+  html += `
+    <div class="add-song-row">
+      <select id="add-song-select">
+        <option value="">${available.length ? 'Add a song from your library...' : 'All songs already added'}</option>
+        ${available.map(s=>`<option value="${s.id}">${esc(s.title)} — ${esc(s.artist)}</option>`).join('')}
+      </select>
+      <button class="btn btn-primary" onclick="addToSetlist('${sl.id}')">Add</button>
+    </div>
+  `;
+
+  return html;
+}
+
+function addToSetlist(slId){
+  const sel = document.getElementById('add-song-select');
+  const songId = sel.value;
+  if(!songId) return;
+  const sl = state.setlists.find(s=>s.id===slId);
+  sl.songIds.push(songId);
+  saveSetlists();
+  render();
+}
+
+function removeFromSetlist(slId, songId){
+  const sl = state.setlists.find(s=>s.id===slId);
+  sl.songIds = sl.songIds.filter(id=>id!==songId);
+  saveSetlists();
+  render();
+}
+
+function moveSong(slId, idx, dir){
+  const sl = state.setlists.find(s=>s.id===slId);
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= sl.songIds.length) return;
+  [sl.songIds[idx], sl.songIds[newIdx]] = [sl.songIds[newIdx], sl.songIds[idx]];
+  saveSetlists();
+  render();
+}
+
+loadData();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
