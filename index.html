@@ -1,733 +1,175 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Repertoire</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#181A20">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Repertoire">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#181A20;
-    --panel:#1F222A;
-    --paper:#ECE4D3;
-    --paper-line:#D8CDB4;
-    --ink:#26221B;
-    --ink-soft:#5B5346;
-    --amber:#E8A33D;
-    --amber-ink:#3D2A08;
-    --red:#C2453A;
-    --orange:#D9822B;
-    --teal:#3E7C74;
-    --green:#4F8F63;
-    --line:#33363F;
-    --line-soft:#2A2D35;
-    --text:#EDEAE1;
-    --text-dim:#9A9EA6;
-    --radius:10px;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:'IBM Plex Sans',system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .app{max-width:920px;margin:0 auto;padding:28px 20px 80px;}
-
-  /* ---------- Header ---------- */
-  header.top{
-    display:flex;align-items:flex-end;justify-content:space-between;
-    margin-bottom:22px;flex-wrap:wrap;gap:14px;
-    border-bottom:2px solid var(--line);
-    padding-bottom:16px;
-  }
-  .brand{display:flex;align-items:baseline;gap:10px;}
-  .brand h1{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:44px;
-    letter-spacing:2px;
-    margin:0;
-    color:var(--amber);
-    line-height:1;
-  }
-  .brand span.sub{
-    font-size:12px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:var(--text-dim);
-  }
-  nav.tabs{display:flex;gap:6px;background:var(--panel);padding:4px;border-radius:999px;border:1px solid var(--line);}
-  nav.tabs button{
-    border:none;background:transparent;color:var(--text-dim);
-    font-family:'IBM Plex Sans';font-weight:600;font-size:13px;
-    padding:8px 18px;border-radius:999px;cursor:pointer;
-    letter-spacing:.3px;
-  }
-  nav.tabs button.active{background:var(--amber);color:var(--amber-ink);}
-
-  /* ---------- Toolbar ---------- */
-  .toolbar{
-    display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;
-  }
-  .toolbar input[type=text], .toolbar select{
-    background:var(--panel);border:1px solid var(--line);color:var(--text);
-    padding:9px 12px;border-radius:8px;font-family:'IBM Plex Sans';font-size:13px;
-  }
-  .toolbar input[type=text]{flex:1;min-width:160px;}
-  .toolbar select{cursor:pointer;}
-  .btn{
-    border:none;cursor:pointer;font-family:'IBM Plex Sans';font-weight:600;font-size:13px;
-    padding:9px 16px;border-radius:8px;letter-spacing:.2px;
-  }
-  .btn-primary{background:var(--amber);color:var(--amber-ink);}
-  .btn-primary:hover{background:#f0ad4e;}
-  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text);}
-  .btn-ghost:hover{border-color:var(--text-dim);}
-  .btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);}
-  .btn-danger:hover{background:rgba(194,69,58,.12);}
-  .btn-sm{padding:6px 10px;font-size:12px;border-radius:6px;}
-  .btn-icon{
-    border:none;background:transparent;color:var(--text-dim);cursor:pointer;
-    padding:4px 8px;font-size:14px;border-radius:6px;
-  }
-  .btn-icon:hover{background:var(--line-soft);color:var(--text);}
-
-  /* ---------- Song cards (setlist-paper look) ---------- */
-  .song-card{
-    background:var(--paper);color:var(--ink);
-    border-radius:8px;padding:14px 16px;margin-bottom:10px;
-    position:relative;
-    border-left:5px solid var(--amber);
-  }
-  .song-card.type-original{border-left-color:var(--teal);}
-  .song-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
-  .song-title-block{min-width:200px;flex:1;}
-  .song-title{font-family:'Bebas Neue';font-size:24px;letter-spacing:.5px;line-height:1;}
-  .song-artist{font-size:13px;color:var(--ink-soft);margin-top:3px;}
-  .song-meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
-  .pill{
-    font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;
-    padding:3px 8px;border-radius:999px;font-weight:600;
-  }
-  .pill-cover{background:rgba(232,163,61,.22);color:#7A4C0C;}
-  .pill-original{background:rgba(62,124,116,.2);color:#1F4B44;}
-  .pill-tag{background:rgba(38,34,27,.08);color:var(--ink-soft);}
-  .song-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-
-  /* Strength meter - signature element */
-  .meter{display:flex;align-items:center;gap:10px;margin-top:10px;}
-  .meter-bars{display:flex;gap:3px;}
-  .meter-bar{width:16px;height:9px;border-radius:2px;opacity:.22;cursor:pointer;}
-  .meter-bar.filled{opacity:1;}
-  .meter-bar:nth-child(1){background:var(--red);}
-  .meter-bar:nth-child(2){background:var(--orange);}
-  .meter-bar:nth-child(3){background:var(--amber);}
-  .meter-bar:nth-child(4){background:var(--teal);}
-  .meter-bar:nth-child(5){background:var(--green);}
-  .meter-label{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;}
-
-  .links-row{display:flex;gap:14px;margin-top:10px;font-size:12.5px;}
-  .links-row a, .links-row button.linklike{
-    color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);
-    background:none;border-top:none;border-left:none;border-right:none;padding:0 0 1px;
-    cursor:pointer;font-family:'IBM Plex Sans';font-weight:600;font-size:12.5px;
-  }
-  .lyrics-box{
-    margin-top:12px;background:rgba(38,34,27,.05);border-radius:6px;padding:12px 14px;
-    font-family:'IBM Plex Mono',monospace;font-size:12.5px;white-space:pre-wrap;
-    max-height:260px;overflow-y:auto;line-height:1.6;
-  }
-
-  .empty{
-    text-align:center;color:var(--text-dim);padding:60px 20px;
-    border:1px dashed var(--line);border-radius:12px;
-  }
-  .empty h3{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;color:var(--text);margin:0 0 6px;}
-
-  /* ---------- Modal ---------- */
-  .overlay{
-    position:fixed;inset:0;background:rgba(10,10,12,.6);
-    display:flex;align-items:flex-start;justify-content:center;
-    padding:40px 16px;overflow-y:auto;z-index:50;
-  }
-  .modal{
-    background:var(--panel);border:1px solid var(--line);border-radius:12px;
-    width:100%;max-width:560px;padding:24px;
-  }
-  .modal h2{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;margin:0 0 18px;color:var(--amber);}
-  .field{margin-bottom:14px;}
-  .field label{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);margin-bottom:5px;font-weight:600;}
-  .field input[type=text], .field input[type=url], .field textarea, .field select{
-    width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);
-    padding:9px 11px;border-radius:7px;font-family:'IBM Plex Sans';font-size:13.5px;
-  }
-  .field textarea{font-family:'IBM Plex Mono',monospace;font-size:12.5px;min-height:120px;resize:vertical;}
-  .type-toggle{display:flex;gap:8px;}
-  .type-toggle button{
-    flex:1;padding:9px;border-radius:7px;border:1px solid var(--line);background:var(--bg);
-    color:var(--text-dim);cursor:pointer;font-weight:600;font-size:13px;
-  }
-  .type-toggle button.active-cover{background:rgba(232,163,61,.18);border-color:var(--amber);color:var(--amber);}
-  .type-toggle button.active-original{background:rgba(62,124,116,.18);border-color:var(--teal);color:var(--teal);}
-  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
-  .row2{display:flex;gap:12px;}
-  .row2>div{flex:1;}
-
-  /* ---------- Setlists ---------- */
-  .setlist-card{
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;
-    align-items:center;flex-wrap:wrap;gap:10px;cursor:pointer;
-  }
-  .setlist-card:hover{border-color:var(--amber);}
-  .setlist-card h3{font-family:'Bebas Neue';font-size:22px;letter-spacing:.5px;margin:0;color:var(--text);}
-  .setlist-card .count{font-size:12px;color:var(--text-dim);margin-top:3px;}
-
-  .setlist-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-  .setlist-detail-header h2{font-family:'Bebas Neue';font-size:32px;letter-spacing:1px;color:var(--amber);margin:0;}
-  .setlist-row{
-    background:var(--paper);color:var(--ink);border-radius:8px;padding:10px 14px;
-    display:flex;align-items:center;gap:12px;margin-bottom:8px;
-  }
-  .setlist-row .num{font-family:'Bebas Neue';font-size:20px;color:var(--ink-soft);width:26px;}
-  .setlist-row .info{flex:1;min-width:0;}
-  .setlist-row .info .t{font-weight:600;font-size:14.5px;}
-  .setlist-row .info .a{font-size:12px;color:var(--ink-soft);}
-  .add-song-row{display:flex;gap:8px;margin-top:16px;}
-  .add-song-row select{flex:1;}
-
-  @media print{
-    body{background:#fff;color:#000;}
-    header.top, .toolbar, .setlist-detail-header .btn, .add-song-row, .btn-icon, nav.tabs, .app > .toolbar{display:none !important;}
-    .setlist-row{background:#fff;border:1px solid #ccc;color:#000;}
-    .setlist-detail-header h2{color:#000;}
-  }
-  ::-webkit-scrollbar{width:8px;}
-  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050607">
+  <meta name="description" content="Citywits — weirdo music, technodystopian heartbreak, and transmissions from the archive.">
+  <title>Citywits — Welcome to the City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Metal+Mania&display=swap" rel="stylesheet">
+  <style>
+    :root{--acid:#b9ff4a;--ice:#e9f5ef;--dim:#98a49f;--black:#050607;--line:rgba(185,255,74,.28)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--black)}
+    body{margin:0;color:var(--ice);background:var(--black);font-family:"DM Mono",monospace;line-height:1.5;overflow-x:hidden}
+    a{color:inherit}
+    .background{position:fixed;inset:0;z-index:0;overflow:hidden;background:#050607 url("Emerald-city/assets/images/vibrantalienlandscape.JPG") center/cover no-repeat}
+    .background video{width:100%;height:100%;object-fit:cover;filter:saturate(.7) contrast(1.12) brightness(.58);transform:scale(1.02)}
+    .background::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(1,5,4,.88) 0%,rgba(2,7,5,.52) 48%,rgba(0,0,0,.78) 100%),linear-gradient(0deg,#050607 0%,transparent 48%,rgba(0,0,0,.35) 100%)}
+    .noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E")}
+    .shell{position:relative;z-index:2;min-height:100vh}
+    header{position:fixed;z-index:10;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:20px clamp(20px,5vw,72px);background:linear-gradient(#050607,transparent)}
+    .mark{font-size:.73rem;letter-spacing:.25em;text-decoration:none;text-transform:uppercase}
+    nav{display:flex;gap:clamp(14px,2.5vw,36px)}
+    nav a{font-size:.68rem;letter-spacing:.12em;text-decoration:none;text-transform:uppercase;color:var(--dim)}
+    nav a:hover,nav a:focus-visible{color:var(--acid)}
+    .hero{min-height:100svh;display:grid;align-content:center;padding:120px clamp(22px,7vw,110px) 80px;max-width:1450px;margin:auto}
+    .eyebrow{display:flex;align-items:center;gap:12px;color:var(--acid);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase}
+    .pulse{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 0 rgba(185,255,74,.7);animation:pulse 2s infinite}
+    @keyframes pulse{70%{box-shadow:0 0 0 12px rgba(185,255,74,0)}100%{box-shadow:0 0 0 0 rgba(185,255,74,0)}}
+    .logo{display:block;margin:12px 0 8px;font-family:"Metal Mania",serif;font-size:clamp(5rem,15vw,12rem);line-height:.82;letter-spacing:-.035em;text-transform:uppercase;color:#fff;-webkit-text-stroke:2px #050607;paint-order:stroke fill;text-shadow:0 5px 0 #050607,0 10px 30px #000}
+    h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+    .lede{max-width:650px;margin:4px 0 30px;color:#edf5f1;font-size:clamp(.95rem,1.5vw,1.15rem);text-shadow:-1px -1px 0 #050607,1px -1px 0 #050607,-1px 1px 0 #050607,1px 1px 0 #050607,0 4px 14px #000}
+    .actions{display:flex;flex-wrap:wrap;gap:12px}
+    .button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 22px;border:1px solid var(--acid);background:var(--acid);color:#091005;text-decoration:none;text-transform:uppercase;letter-spacing:.1em;font-size:.76rem;font-weight:500;transition:.2s ease}
+    .button:hover,.button:focus-visible{transform:translateY(-2px);box-shadow:0 8px 30px rgba(185,255,74,.22)}
+    .button.ghost{background:rgba(5,6,7,.4);color:var(--ice);border-color:rgba(233,245,239,.42);backdrop-filter:blur(8px)}
+    .scroll{position:absolute;bottom:25px;right:clamp(22px,5vw,72px);writing-mode:vertical-rl;color:var(--dim);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase}
+    .content{background:linear-gradient(180deg,rgba(5,6,7,.94),#050607 180px);padding:90px clamp(22px,7vw,110px) 50px}
+    .grid{max-width:1250px;margin:auto;display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(40px,8vw,120px)}
+    h2{font-family:"Metal Mania",serif;font-size:clamp(2.5rem,6vw,5.5rem);font-weight:400;line-height:.9;margin:0 0 20px;color:var(--ice);-webkit-text-stroke:1px #050607;paint-order:stroke fill;text-shadow:0 4px 0 #050607}
+    .intro p{max-width:440px;color:var(--dim)}
+    .portal-list{border-top:1px solid var(--line)}
+    .portal{display:grid;grid-template-columns:50px 1fr auto;align-items:center;gap:14px;padding:24px 4px;border-bottom:1px solid var(--line);text-decoration:none;transition:.2s ease}
+    .portal:hover,.portal:focus-visible{padding-left:14px;color:var(--acid);background:linear-gradient(90deg,rgba(185,255,74,.07),transparent)}
+    .number{font-size:.65rem;color:var(--acid)}
+    .portal strong{font-size:clamp(1rem,2vw,1.35rem);font-weight:400;text-transform:uppercase;letter-spacing:.06em}
+    .arrow{font-size:1.4rem}
+    .sound-toggle{position:fixed;z-index:12;right:clamp(18px,3vw,42px);bottom:24px;border:1px solid var(--acid);background:rgba(5,6,7,.82);color:var(--acid);padding:12px 15px;font:500 .65rem/1 "DM Mono",monospace;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(10px)}
+    .sound-toggle:hover,.sound-toggle:focus-visible{background:var(--acid);color:#081005}
+    .covers{max-width:1250px;margin:100px auto 0}
+    .section-label{color:var(--acid);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:22px}
+    .cover-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2.5vw,28px)}
+    .cover{position:relative;display:block;aspect-ratio:1;overflow:hidden;border:1px solid rgba(255,255,255,.2);background:#111;text-decoration:none}
+    .cover img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease,filter .45s ease}
+    .cover span{position:absolute;left:0;right:0;bottom:0;padding:35px 14px 13px;background:linear-gradient(transparent,rgba(0,0,0,.9));font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
+    .cover:hover img,.cover:focus-visible img{transform:scale(1.045);filter:saturate(1.25)}
+    .bio-contact{max-width:1250px;margin:110px auto 0;padding-top:55px;border-top:1px solid var(--line);display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(40px,8vw,120px)}
+    .bio-copy{color:#b6c0bc;max-width:680px}
+    .bio-copy p{margin:0 0 1em}
+    .bio-photo{display:block;width:100%;margin-top:30px;border:1px solid var(--line);filter:saturate(.82) contrast(1.05);box-shadow:14px 14px 0 rgba(185,255,74,.08)}
+    .bio-copy .declaration{color:var(--ice);font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-left:3px solid var(--acid);padding:12px 0 12px 18px;margin:26px 0}
+    .contact-card{margin-top:45px;padding:28px;border:1px solid var(--line);background:rgba(185,255,74,.035)}
+    .contact-card h3{margin:0 0 16px;color:var(--acid);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+    .email-link{display:inline-block;margin:6px 0 4px;color:var(--ice);overflow-wrap:anywhere}
+    .contact-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+    footer{max-width:1250px;margin:90px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#69736f;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em}
+    @media(max-width:720px){header{position:absolute}nav a:not(:last-child){display:none}.hero{padding-top:105px}.logo{font-size:clamp(4.4rem,23vw,7rem);-webkit-text-stroke:1px #050607}.scroll{display:none}.grid,.bio-contact{grid-template-columns:1fr}.content{padding-top:70px}.portal{grid-template-columns:36px 1fr auto}.cover-grid{grid-template-columns:1fr}.sound-toggle{bottom:14px;right:14px}.background::after{background:linear-gradient(0deg,#050607 0%,rgba(2,5,4,.3) 70%,rgba(0,0,0,.55) 100%)}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pulse{animation:none}.background video{display:none}.button,.portal{transition:none}}
+  </style>
 </head>
 <body>
-<div class="app" id="app"></div>
-
-<script>
-const STRENGTH_LABELS = ["", "Rough", "Shaky", "Solid", "Tight", "Locked In"];
-
-let state = {
-  songs: [],
-  setlists: [],
-  view: "library",
-  activeSetlistId: null,
-  search: "",
-  typeFilter: "all",
-  sort: "title",
-  modal: null,
-  loading: true
-};
-
-async function loadData(){
-  try{
-    const s = localStorage.getItem('repertoire_songs');
-    state.songs = s ? JSON.parse(s) : [];
-  }catch(e){ state.songs = []; }
-  try{
-    const sl = localStorage.getItem('repertoire_setlists');
-    state.setlists = sl ? JSON.parse(sl) : [];
-  }catch(e){ state.setlists = []; }
-  state.loading = false;
-  render();
-}
-
-async function saveSongs(){
-  try{ localStorage.setItem('repertoire_songs', JSON.stringify(state.songs)); }
-  catch(e){ console.error('save songs failed', e); alert('Could not save — your browser storage may be full.'); }
-}
-async function saveSetlists(){
-  try{ localStorage.setItem('repertoire_setlists', JSON.stringify(state.setlists)); }
-  catch(e){ console.error('save setlists failed', e); alert('Could not save — your browser storage may be full.'); }
-}
-
-function exportData(){
-  const data = {songs: state.songs, setlists: state.setlists, exportedAt: new Date().toISOString()};
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `repertoire-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function triggerImport(){
-  document.getElementById('import-file-input').click();
-}
-
-function importData(fileInput){
-  const file = fileInput.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try{
-      const data = JSON.parse(e.target.result);
-      if(!Array.isArray(data.songs) || !Array.isArray(data.setlists)) throw new Error('bad format');
-      if(state.songs.length && !confirm('This will replace your current library and setlists with the imported backup. Continue?')) return;
-      state.songs = data.songs;
-      state.setlists = data.setlists;
-      saveSongs();
-      saveSetlists();
-      render();
-    }catch(err){
-      alert("Couldn't read that file — make sure it's a Repertoire backup JSON file.");
-    }
-  };
-  reader.readAsText(file);
-  fileInput.value = '';
-}
-
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function esc(s){ return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function renderMeter(strength, songId, editable){
-  let bars = "";
-  for(let i=1;i<=5;i++){
-    bars += `<div class="meter-bar ${i<=strength?'filled':''}" ${editable?`onclick="setStrength('${songId}',${i})"`:''}></div>`;
-  }
-  return `<div class="meter">
-    <div class="meter-bars">${bars}</div>
-    <div class="meter-label">${STRENGTH_LABELS[strength] || "Unrated"}</div>
-  </div>`;
-}
-
-function setStrength(id, val){
-  const song = state.songs.find(s=>s.id===id);
-  if(!song) return;
-  song.strength = song.strength === val ? val : val;
-  saveSongs();
-  render();
-}
-
-function getFilteredSongs(){
-  let list = [...state.songs];
-  if(state.search.trim()){
-    const q = state.search.toLowerCase();
-    list = list.filter(s =>
-      s.title.toLowerCase().includes(q) ||
-      s.artist.toLowerCase().includes(q) ||
-      (s.tags||[]).some(t=>t.toLowerCase().includes(q))
-    );
-  }
-  if(state.typeFilter !== "all"){
-    list = list.filter(s => s.type === state.typeFilter);
-  }
-  if(state.sort === "title") list.sort((a,b)=>a.title.localeCompare(b.title));
-  else if(state.sort === "artist") list.sort((a,b)=>a.artist.localeCompare(b.artist));
-  else if(state.sort === "strength-desc") list.sort((a,b)=>b.strength-a.strength);
-  else if(state.sort === "strength-asc") list.sort((a,b)=>a.strength-b.strength);
-  return list;
-}
-
-function render(){
-  const app = document.getElementById('app');
-  if(state.loading){
-    app.innerHTML = `<div class="empty">Loading your repertoire…</div>`;
-    return;
-  }
-
-  const active = document.activeElement;
-  const activeId = (active && app.contains(active) && active.id) ? active.id : null;
-  const selStart = activeId && 'selectionStart' in active ? active.selectionStart : null;
-  const selEnd = activeId && 'selectionEnd' in active ? active.selectionEnd : null;
-
-  let html = `
-    <header class="top">
-      <div class="brand">
-        <h1>REPERTOIRE</h1>
-        <span class="sub">songs you can play, on command</span>
-      </div>
-      <nav class="tabs">
-        <button class="${state.view==='library'?'active':''}" onclick="switchView('library')">Library</button>
-        <button class="${state.view==='setlists'||state.view==='setlist-detail'?'active':''}" onclick="switchView('setlists')">Setlists</button>
+  <div class="background" aria-hidden="true">
+    <video autoplay muted loop playsinline poster="Emerald-city/assets/images/vibrantalienlandscape.JPG">
+      <source src="Emerald-city/assets/video/cityliftoff.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="shell">
+    <header>
+      <a class="mark" href="#top">CW / Archive</a>
+      <nav aria-label="Primary navigation">
+        <a href="#transmissions">Transmissions</a>
+        <a href="https://www.youtube.com/@citywits" target="_blank" rel="noopener">Video</a>
+        <a href="#bio">Bio + Contact</a>
       </nav>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Download a backup of your data">Backup</button>
-        <button class="btn btn-ghost btn-sm" onclick="triggerImport()" title="Restore from a backup file">Restore</button>
-        <input type="file" id="import-file-input" accept="application/json" style="display:none" onchange="importData(this)">
-      </div>
     </header>
-  `;
-
-  if(state.view === 'library') html += renderLibrary();
-  else if(state.view === 'setlists') html += renderSetlists();
-  else if(state.view === 'setlist-detail') html += renderSetlistDetail();
-
-  if(state.modal === 'song') html += renderSongModal();
-  if(state.modal === 'setlist') html += renderSetlistModal();
-
-  app.innerHTML = html;
-
-  if(activeId){
-    const el = document.getElementById(activeId);
-    if(el){
-      el.focus();
-      if(selStart !== null && selEnd !== null && 'setSelectionRange' in el){
-        try{ el.setSelectionRange(selStart, selEnd); }catch(e){}
+    <main>
+      <section class="hero" id="top">
+        <div class="eyebrow"><span class="pulse"></span>Transmission active</div>
+        <h1>Citywits</h1>
+        <div class="logo" aria-hidden="true">Citywits</div>
+        <p class="lede">Cult music without the cult following,<br>weirdo music for normal people / normal music for weirdo people.</p>
+        <div class="actions">
+          <a class="button" href="https://citywits.bandcamp.com" target="_blank" rel="noopener">Play the music ↗</a>
+          <a class="button ghost" href="#transmissions">Enter the archive ↓</a>
+        </div>
+        <span class="scroll">Scroll to descend</span>
+      </section>
+      <section class="content" id="transmissions">
+        <div class="grid">
+          <div class="intro">
+            <p class="eyebrow">Recovered signals / 001</p>
+            <h2>The archive is alive.</h2>
+            <p>Right now this portal can lead you to the various realms of the internet where Citywits already exists, or you can contact me regarding recording time, the tunes, bookings, projects, collabs, and really anything you wish. This space is under construction (and just like your local highways, will probably remain that way for years), there is a grand vision of this place as a permanent archive for ALL the music and art and random stuff over years of time that have been added to the City.</p>
+          </div>
+          <div class="portal-list">
+            <a class="portal" href="https://citywits.bandcamp.com" target="_blank" rel="noopener"><span class="number">01</span><strong>Bandcamp / full transmissions</strong><span class="arrow">↗</span></a>
+            <a class="portal" href="https://open.spotify.com/artist/2tB2LRfIx9ejZCEwAfiyDt" target="_blank" rel="noopener"><span class="number">02</span><strong>Spotify / broadcast feed</strong><span class="arrow">↗</span></a>
+            <a class="portal" href="https://www.youtube.com/@citywits" target="_blank" rel="noopener"><span class="number">03</span><strong>YouTube / visual evidence</strong><span class="arrow">↗</span></a>
+            <a class="portal" href="https://www.instagram.com/citywits/" target="_blank" rel="noopener"><span class="number">04</span><strong>Instagram / field reports</strong><span class="arrow">↗</span></a>
+            <a class="portal" href="https://www.instagram.com/citywits/" target="_blank" rel="noopener"><span class="number">05</span><strong>Contact / open channel</strong><span class="arrow">↗</span></a>
+          </div>
+        </div>
+        <section class="covers" aria-labelledby="covers-title">
+          <p class="section-label">For the impatient / visual index</p>
+          <h2 id="covers-title">Choose a cover.</h2>
+          <div class="cover-grid">
+            <a class="cover" href="https://www.youtube.com/playlist?list=PLwM0Po_wo_M9vFp0nMmSKrJM2k_GcWJ2i" target="_blank" rel="noopener"><img src="Emerald-city/assets/images/elemeno-oldman.JPG" alt="Elemeno EP album artwork" loading="lazy"><span>Open Elemeno on YouTube ↗</span></a>
+            <a class="cover" href="https://citywits.bandcamp.com/album/weirdo-music" target="_blank" rel="noopener"><img src="Emerald-city/assets/images/3kalbumcover.PNG" alt="Weirdo Music album artwork" loading="lazy"><span>Open Weirdo Music ↗</span></a>
+            <a class="cover" href="https://citywits.bandcamp.com" target="_blank" rel="noopener"><img src="Emerald-city/assets/images/polaroidalbumcover.PNG" alt="Citywits polaroid album artwork" loading="lazy"><span>Open the record ↗</span></a>
+          </div>
+        </section>
+        <section class="bio-contact" id="bio">
+          <div>
+            <p class="section-label">Personnel file / open channel</p>
+            <h2>Bio + Contact</h2>
+            <img class="bio-photo" src="Emerald-city/assets/images/LHCYE1889.JPG" alt="Citywits portrait" loading="lazy">
+          </div>
+          <div class="bio-copy">
+            <p>Citywits is a musical project that I have maintained for about ten years post my prior band Small Drawings. I moved abroad and Citywits was originally founded as a way to make solo music when I didn’t have anyone around to make music with.</p>
+            <p>I am self taught on all instruments (minus like a year of guitar lessons when I was 12) and self produced. All Citywits music is written, played, produced, recorded, mastered, and everything else, by me the human. However I have always been interested in new tech and “experimental” approaches and on the most recent two albums I have employed AI for a variety of tasks (non musical).</p>
+            <p class="declaration">The music is not and will never be AI.</p>
+            <p>I dont make any money from this, this is a passion project. The writing and the playing of the music is why I do this in the first place. There are many things you can say about Citywits but it’s clearly of its own style. Ive yet to hear a citywits-esque AI song lol.</p>
+            <p>I use AI as a general companion to discuss ideas with, as a coder for this very website, a recording engineers assistant, and more. It is the opinion of Citywits that this technology has immense potential for creative applications in concert with a human collaborator, and really that it isnt going anywhere. In fact, it’s getting better all the time, and Citywits plans to adapt.</p>
+            <p>Citywits has released 2.5 albums: “Elemeno” (more of an EP, up on YouTube and SoundCloud, never officially released), “Weirdo Music” (made in early 2025 when things were on the up), and “Citywits” (made in late 2025, when things were totally obliterated).</p>
+            <p>Currently there are about 6 songs that are in pretty deep stages of completion, but due to some life circumstances (including dickhead neighbors) work has largely stalled and been put on the back burner. Citywits will return, it always does.</p>
+            <p>In the mean time, I still play some covers on YouTube, make videos here and there, and run Citywits Studios. If you or a loved one need affordable recording time with a guy who even critics describe as “pretty chill” contact me and we can work something out.</p>
+            <p>I have done a handful of tracks for different people but most recently I did 3 songs for the artist Cathartic B. — Hellspeak, Dont Be So Dramatic, and Am I FaLLn Or Am I Trippin? There are a couple others on my YouTube, any and all genres welcome!</p>
+            <div class="contact-card">
+              <h3>Contact</h3>
+              <p>Feel free to contact us with any queries, comments, concerns, or just because you’re mentally unwell. Or, if you seek recording time, Citywits Studios is currently located in Reno, NV.</p>
+              <a class="email-link" href="mailto:Citywitsofficial@gmail.com">Citywitsofficial@gmail.com</a>
+              <p>Anything beyond the listed info will be vetted by my two cats thoroughly. Thank you.</p>
+            </div>
+            <div class="contact-links">
+              <a class="button" href="mailto:Citywitsofficial@gmail.com">Email Citywits →</a>
+              <a class="button ghost" href="https://www.instagram.com/citywits/" target="_blank" rel="noopener">Instagram / message ↗</a>
+              <a class="button ghost" href="https://www.youtube.com/@citywits" target="_blank" rel="noopener">YouTube ↗</a>
+            </div>
+          </div>
+        </section>
+        <footer><span>© 2026 Citywits</span><span>Nothing here is stable. That is the point.</span></footer>
+      </section>
+    </main>
+  </div>
+  <audio id="city-soundtrack" preload="metadata" loop>
+    <source src="Emerald-city/assets/audio/Disclosure%20Dance.m4a" type="audio/mp4">
+  </audio>
+  <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false">Sound: off</button>
+  <script>
+    const soundtrack = document.getElementById('city-soundtrack');
+    const soundToggle = document.getElementById('sound-toggle');
+    soundToggle.addEventListener('click', async () => {
+      if (soundtrack.paused) {
+        try { await soundtrack.play(); soundToggle.textContent = 'Sound: on'; soundToggle.setAttribute('aria-pressed', 'true'); }
+        catch (_) { soundToggle.textContent = 'Tap to play'; }
+      } else {
+        soundtrack.pause(); soundToggle.textContent = 'Sound: off'; soundToggle.setAttribute('aria-pressed', 'false');
       }
-    }
-  }
-}
-
-function renderLibrary(){
-  const songs = getFilteredSongs();
-  let html = `
-    <div class="toolbar">
-      <input type="text" id="library-search" placeholder="Search title, artist, or tag..." value="${esc(state.search)}" oninput="state.search=this.value;render()">
-      <select onchange="state.typeFilter=this.value;render()">
-        <option value="all" ${state.typeFilter==='all'?'selected':''}>All types</option>
-        <option value="cover" ${state.typeFilter==='cover'?'selected':''}>Covers</option>
-        <option value="original" ${state.typeFilter==='original'?'selected':''}>Originals</option>
-      </select>
-      <select onchange="state.sort=this.value;render()">
-        <option value="title" ${state.sort==='title'?'selected':''}>Sort: Title</option>
-        <option value="artist" ${state.sort==='artist'?'selected':''}>Sort: Artist</option>
-        <option value="strength-desc" ${state.sort==='strength-desc'?'selected':''}>Sort: Strongest first</option>
-        <option value="strength-asc" ${state.sort==='strength-asc'?'selected':''}>Sort: Weakest first</option>
-      </select>
-      <button class="btn btn-primary" onclick="openSongModal()">+ Add song</button>
-    </div>
-  `;
-
-  if(songs.length === 0){
-    html += `<div class="empty"><h3>No songs yet</h3>Add the first song you can play — cover or original.</div>`;
-    return html;
-  }
-
-  songs.forEach(song => {
-    const tags = (song.tags||[]).map(t=>`<span class="pill pill-tag">#${esc(t)}</span>`).join('');
-    html += `
-      <div class="song-card type-${song.type}">
-        <div class="song-row">
-          <div class="song-title-block">
-            <div class="song-title">${esc(song.title)}</div>
-            <div class="song-artist">${esc(song.artist)}${song.key ? ' · Key of ' + esc(song.key) : ''}</div>
-            <div class="song-meta">
-              <span class="pill pill-${song.type}">${song.type}</span>
-              ${tags}
-            </div>
-            ${renderMeter(song.strength, song.id, true)}
-            <div class="links-row">
-              ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">Tab / chords ↗</a>` : ''}
-              ${song.lyrics ? `<button class="linklike" onclick="toggleLyrics('${song.id}')">${song.showLyrics? 'Hide lyrics' : 'Show lyrics'}</button>` : ''}
-            </div>
-            ${song.showLyrics && song.lyrics ? `<div class="lyrics-box">${esc(song.lyrics)}</div>` : ''}
-          </div>
-          <div class="song-actions">
-            <button class="btn-icon" onclick="openSongModal('${song.id}')" title="Edit">Edit</button>
-            <button class="btn-icon" onclick="deleteSong('${song.id}')" title="Delete">Delete</button>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-
-  return html;
-}
-
-function toggleLyrics(id){
-  const song = state.songs.find(s=>s.id===id);
-  song.showLyrics = !song.showLyrics;
-  render();
-}
-
-function deleteSong(id){
-  if(!confirm('Remove this song from your repertoire?')) return;
-  state.songs = state.songs.filter(s=>s.id!==id);
-  state.setlists.forEach(sl => sl.songIds = sl.songIds.filter(sid=>sid!==id));
-  saveSongs();
-  saveSetlists();
-  render();
-}
-
-function openSongModal(id){
-  state.modal = 'song';
-  state.editingSongId = id || null;
-  render();
-}
-
-function renderSongModal(){
-  const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
-  const d = editing || {title:'',artist:'',type:'cover',strength:1,tabUrl:'',lyrics:'',tags:[],key:''};
-  return `
-    <div class="overlay" onclick="if(event.target===this) closeModal()">
-      <div class="modal">
-        <h2>${editing ? 'Edit song' : 'Add a song'}</h2>
-        <div class="field">
-          <label>Title</label>
-          <input type="text" id="f-title" value="${esc(d.title)}" placeholder="Wonderwall">
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label>Artist</label>
-            <input type="text" id="f-artist" value="${esc(d.artist)}" placeholder="Oasis">
-          </div>
-          <div class="field">
-            <label>Key (optional)</label>
-            <input type="text" id="f-key" value="${esc(d.key)}" placeholder="G">
-          </div>
-        </div>
-        <div class="field">
-          <label>Type</label>
-          <div class="type-toggle">
-            <button type="button" id="btn-cover" class="${d.type==='cover'?'active-cover':''}" onclick="setModalType('cover')">Cover</button>
-            <button type="button" id="btn-original" class="${d.type==='original'?'active-original':''}" onclick="setModalType('original')">Original</button>
-          </div>
-        </div>
-        <div class="field">
-          <label>How well do you know it?</label>
-          ${renderMeter(d.strength, 'modal', false).replace(/onclick="[^"]*"/g,'').replace(/meter-bar /g, 'meter-bar clickable ')}
-          <div id="modal-meter" style="margin-top:6px;">
-            ${[1,2,3,4,5].map(i=>`<button type="button" class="btn-sm btn-ghost" style="margin-right:4px;${d.strength===i?'border-color:var(--amber);color:var(--amber);':''}" onclick="setModalStrength(${i})">${i}</button>`).join('')} <span id="modal-strength-label" style="font-size:12px;color:var(--text-dim);">${STRENGTH_LABELS[d.strength]}</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Tags (comma separated)</label>
-          <input type="text" id="f-tags" value="${esc((d.tags||[]).join(', '))}" placeholder="rock, 90s, singalong">
-        </div>
-        <div class="field">
-          <label>Tab / chords link</label>
-          <input type="url" id="f-taburl" value="${esc(d.tabUrl)}" placeholder="https://...">
-        </div>
-        <div class="field">
-          <label>Lyrics (optional)</label>
-          <textarea id="f-lyrics" placeholder="Paste lyrics or chord chart here...">${esc(d.lyrics)}</textarea>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" onclick="saveSongForm()">Save song</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-let modalType = null;
-let modalStrength = null;
-
-function setModalType(t){
-  modalType = t;
-  document.getElementById('btn-cover').className = t==='cover' ? 'active-cover' : '';
-  document.getElementById('btn-original').className = t==='original' ? 'active-original' : '';
-}
-function setModalStrength(v){
-  modalStrength = v;
-  document.getElementById('modal-strength-label').textContent = STRENGTH_LABELS[v];
-  const btns = document.querySelectorAll('#modal-meter .btn-sm');
-  btns.forEach((b,i)=>{ b.style.borderColor = (i+1===v) ? 'var(--amber)' : ''; b.style.color = (i+1===v) ? 'var(--amber)' : ''; });
-}
-
-function saveSongForm(){
-  const title = document.getElementById('f-title').value.trim();
-  if(!title){ alert('Give the song a title.'); return; }
-  const artist = document.getElementById('f-artist').value.trim();
-  const key = document.getElementById('f-key').value.trim();
-  const tags = document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  const tabUrl = document.getElementById('f-taburl').value.trim();
-  const lyrics = document.getElementById('f-lyrics').value;
-  const editing = state.editingSongId ? state.songs.find(s=>s.id===state.editingSongId) : null;
-  const type = modalType || (editing ? editing.type : 'cover');
-  const strength = modalStrength || (editing ? editing.strength : 1);
-
-  if(editing){
-    Object.assign(editing, {title, artist, key, tags, tabUrl, lyrics, type, strength});
-  } else {
-    state.songs.push({id: uid(), title, artist, key, tags, tabUrl, lyrics, type, strength, showLyrics:false});
-  }
-  saveSongs();
-  modalType = null; modalStrength = null;
-  closeModal();
-}
-
-function closeModal(){
-  state.modal = null;
-  state.editingSongId = null;
-  modalType = null; modalStrength = null;
-  render();
-}
-
-/* ---------- Setlists ---------- */
-
-function switchView(v){
-  state.view = v;
-  state.activeSetlistId = null;
-  render();
-}
-
-function renderSetlists(){
-  let html = `
-    <div class="toolbar">
-      <div style="flex:1;"></div>
-      <button class="btn btn-primary" onclick="openSetlistModal()">+ New setlist</button>
-    </div>
-  `;
-  if(state.setlists.length === 0){
-    html += `<div class="empty"><h3>No setlists yet</h3>Group songs together for a show, rehearsal, or open mic.</div>`;
-    return html;
-  }
-  state.setlists.forEach(sl => {
-    html += `
-      <div class="setlist-card" onclick="openSetlist('${sl.id}')">
-        <div>
-          <h3>${esc(sl.name)}</h3>
-          <div class="count">${sl.songIds.length} song${sl.songIds.length!==1?'s':''}</div>
-        </div>
-        <div class="song-actions" onclick="event.stopPropagation()">
-          <button class="btn-icon" onclick="deleteSetlist('${sl.id}')">Delete</button>
-        </div>
-      </div>
-    `;
-  });
-  return html;
-}
-
-function openSetlistModal(){
-  state.modal = 'setlist';
-  render();
-}
-
-function renderSetlistModal(){
-  return `
-    <div class="overlay" onclick="if(event.target===this) closeModal()">
-      <div class="modal" style="max-width:420px;">
-        <h2>New setlist</h2>
-        <div class="field">
-          <label>Name</label>
-          <input type="text" id="f-setlist-name" placeholder="Sarah's Wedding — June">
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" onclick="createSetlist()">Create</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function createSetlist(){
-  const name = document.getElementById('f-setlist-name').value.trim();
-  if(!name){ alert('Give the setlist a name.'); return; }
-  const sl = {id: uid(), name, songIds: []};
-  state.setlists.push(sl);
-  saveSetlists();
-  state.modal = null;
-  state.view = 'setlist-detail';
-  state.activeSetlistId = sl.id;
-  render();
-}
-
-function deleteSetlist(id){
-  if(!confirm('Delete this setlist? Songs stay in your library.')) return;
-  state.setlists = state.setlists.filter(s=>s.id!==id);
-  saveSetlists();
-  render();
-}
-
-function openSetlist(id){
-  state.view = 'setlist-detail';
-  state.activeSetlistId = id;
-  render();
-}
-
-function renderSetlistDetail(){
-  const sl = state.setlists.find(s=>s.id===state.activeSetlistId);
-  if(!sl){ state.view='setlists'; return renderSetlists(); }
-
-  let html = `
-    <div class="setlist-detail-header">
-      <div>
-        <button class="btn btn-ghost btn-sm" onclick="switchView('setlists')">&larr; Back</button>
-      </div>
-      <h2>${esc(sl.name)}</h2>
-      <button class="btn btn-ghost" onclick="window.print()">Print</button>
-    </div>
-  `;
-
-  if(sl.songIds.length === 0){
-    html += `<div class="empty"><h3>Empty setlist</h3>Add songs from your library below.</div>`;
-  } else {
-    sl.songIds.forEach((sid, idx) => {
-      const song = state.songs.find(s=>s.id===sid);
-      if(!song) return;
-      html += `
-        <div class="setlist-row">
-          <div class="num">${idx+1}</div>
-          <div class="info">
-            <div class="t">${esc(song.title)}</div>
-            <div class="a">${esc(song.artist)}</div>
-          </div>
-          ${renderMeter(song.strength, song.id, false)}
-          <div class="song-actions">
-            <button class="btn-icon" onclick="moveSong('${sl.id}',${idx},-1)" ${idx===0?'disabled style="opacity:.3"':''}>&uarr;</button>
-            <button class="btn-icon" onclick="moveSong('${sl.id}',${idx},1)" ${idx===sl.songIds.length-1?'disabled style="opacity:.3"':''}>&darr;</button>
-            <button class="btn-icon" onclick="removeFromSetlist('${sl.id}','${sid}')">Remove</button>
-          </div>
-        </div>
-      `;
     });
-  }
-
-  const available = state.songs.filter(s => !sl.songIds.includes(s.id));
-  html += `
-    <div class="add-song-row">
-      <select id="add-song-select">
-        <option value="">${available.length ? 'Add a song from your library...' : 'All songs already added'}</option>
-        ${available.map(s=>`<option value="${s.id}">${esc(s.title)} — ${esc(s.artist)}</option>`).join('')}
-      </select>
-      <button class="btn btn-primary" onclick="addToSetlist('${sl.id}')">Add</button>
-    </div>
-  `;
-
-  return html;
-}
-
-function addToSetlist(slId){
-  const sel = document.getElementById('add-song-select');
-  const songId = sel.value;
-  if(!songId) return;
-  const sl = state.setlists.find(s=>s.id===slId);
-  sl.songIds.push(songId);
-  saveSetlists();
-  render();
-}
-
-function removeFromSetlist(slId, songId){
-  const sl = state.setlists.find(s=>s.id===slId);
-  sl.songIds = sl.songIds.filter(id=>id!==songId);
-  saveSetlists();
-  render();
-}
-
-function moveSong(slId, idx, dir){
-  const sl = state.setlists.find(s=>s.id===slId);
-  const newIdx = idx + dir;
-  if(newIdx < 0 || newIdx >= sl.songIds.length) return;
-  [sl.songIds[idx], sl.songIds[newIdx]] = [sl.songIds[newIdx], sl.songIds[idx]];
-  saveSetlists();
-  render();
-}
-
-loadData();
-
-if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
-}
-</script>
+  </script>
 </body>
 </html>
