@@ -152,6 +152,13 @@
   }
   .empty h3{font-family:'Bebas Neue';font-size:26px;letter-spacing:1px;color:var(--text);margin:0 0 6px;}
 
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px 14px;}
+  .stat strong{display:block;font-family:'Bebas Neue';font-size:27px;line-height:1;color:var(--amber);}
+  .stat span{display:block;margin-top:5px;color:var(--text-dim);font-size:10px;letter-spacing:.7px;text-transform:uppercase;}
+  .practice-meta{font-size:11px;color:var(--ink-soft);margin-top:8px;}
+  .needs-work{border-left-color:var(--red);}
+
   /* ---------- Modal ---------- */
   .overlay{
     position:fixed;inset:0;background:rgba(10,10,12,.6);
@@ -204,6 +211,13 @@
   .add-song-row{display:flex;gap:8px;margin-top:16px;}
   .add-song-row select{flex:1;}
 
+  @media(max-width:640px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .app{padding:18px 12px 70px}
+    .brand{display:block}.brand h1{font-size:38px}.brand span.sub{display:block;margin-top:5px}
+    nav.tabs{width:100%}nav.tabs button{flex:1}
+    .song-actions{width:100%;justify-content:flex-end}
+  }
   @media print{
     body{background:#fff;color:#000;}
     header.top, .toolbar, .setlist-detail-header .btn, .add-song-row, .btn-icon, nav.tabs, .app > .toolbar{display:none !important;}
@@ -308,9 +322,40 @@ function renderMeter(strength, songId, editable){
 function setStrength(id, val){
   const song = state.songs.find(s=>s.id===id);
   if(!song) return;
-  song.strength = song.strength === val ? val : val;
+  song.strength = val;
+  song.updatedAt = new Date().toISOString();
   saveSongs();
   render();
+}
+
+function markPracticed(id){
+  const song = state.songs.find(s=>s.id===id);
+  if(!song) return;
+  song.lastPracticed = new Date().toISOString();
+  song.practiceCount = (song.practiceCount || 0) + 1;
+  saveSongs();
+  render();
+}
+
+function dayLabel(iso){
+  if(!iso) return 'Never practiced';
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if(days <= 0) return 'Practiced today';
+  if(days === 1) return 'Practiced yesterday';
+  return `Practiced ${days} days ago`;
+}
+
+function renderStats(){
+  const total = state.songs.length;
+  const ready = state.songs.filter(s=>(s.strength||0)>=4).length;
+  const learning = state.songs.filter(s=>(s.strength||0)<4).length;
+  const practiced = state.songs.reduce((n,s)=>n+(s.practiceCount||0),0);
+  return `<div class="stats">
+    <div class="stat"><strong>${total}</strong><span>Total songs</span></div>
+    <div class="stat"><strong>${ready}</strong><span>Show ready</span></div>
+    <div class="stat"><strong>${learning}</strong><span>Need work</span></div>
+    <div class="stat"><strong>${practiced}</strong><span>Practice sessions</span></div>
+  </div>`;
 }
 
 function getFilteredSongs(){
@@ -370,7 +415,7 @@ function render(){
 
 function renderLibrary(){
   const songs = getFilteredSongs();
-  let html = `
+  let html = renderStats() + `
     <div class="toolbar">
       <input type="text" placeholder="Search title, artist, or tag..." value="${esc(state.search)}" oninput="state.search=this.value;render()">
       <select onchange="state.typeFilter=this.value;render()">
@@ -396,7 +441,7 @@ function renderLibrary(){
   songs.forEach(song => {
     const tags = (song.tags||[]).map(t=>`<span class="pill pill-tag">#${esc(t)}</span>`).join('');
     html += `
-      <div class="song-card type-${song.type}">
+      <div class="song-card type-${song.type} ${(song.strength||0)<3?'needs-work':''}">
         <div class="song-row">
           <div class="song-title-block">
             <div class="song-title">${esc(song.title)}</div>
@@ -406,6 +451,7 @@ function renderLibrary(){
               ${tags}
             </div>
             ${renderMeter(song.strength, song.id, true)}
+            <div class="practice-meta">${dayLabel(song.lastPracticed)} · ${song.practiceCount||0} session${song.practiceCount===1?'':'s'}</div>
             <div class="links-row">
               ${song.tabUrl ? `<a href="${esc(song.tabUrl)}" target="_blank" rel="noopener">Tab / chords ↗</a>` : ''}
               ${song.lyrics ? `<button class="linklike" onclick="toggleLyrics('${song.id}')">${song.showLyrics? 'Hide lyrics' : 'Show lyrics'}</button>` : ''}
@@ -413,6 +459,7 @@ function renderLibrary(){
             ${song.showLyrics && song.lyrics ? `<div class="lyrics-box">${esc(song.lyrics)}</div>` : ''}
           </div>
           <div class="song-actions">
+            <button class="btn btn-primary btn-sm" onclick="markPracticed('${song.id}')" title="Log a practice session">Practiced</button>
             <button class="btn-icon" onclick="openSongModal('${song.id}')" title="Edit">Edit</button>
             <button class="btn-icon" onclick="deleteSong('${song.id}')" title="Delete">Delete</button>
           </div>
@@ -569,7 +616,7 @@ function renderSetlists(){
       <div class="setlist-card" onclick="openSetlist('${sl.id}')">
         <div>
           <h3>${esc(sl.name)}</h3>
-          <div class="count">${sl.songIds.length} song${sl.songIds.length!==1?'s':''}</div>
+          <div class="count">${sl.songIds.length} song${sl.songIds.length!==1?'s':''}${sl.date?' · '+esc(sl.date):''}${sl.venue?' · '+esc(sl.venue):''}</div>
         </div>
         <div class="song-actions" onclick="event.stopPropagation()">
           <button class="btn-icon" onclick="deleteSetlist('${sl.id}')">Delete</button>
@@ -594,6 +641,11 @@ function renderSetlistModal(){
           <label>Name</label>
           <input type="text" id="f-setlist-name" placeholder="Sarah's Wedding — June">
         </div>
+        <div class="row2">
+          <div class="field"><label>Date (optional)</label><input type="text" id="f-setlist-date" placeholder="2026-09-12"></div>
+          <div class="field"><label>Venue (optional)</label><input type="text" id="f-setlist-venue" placeholder="The Holland Project"></div>
+        </div>
+        <div class="field"><label>Show notes</label><textarea id="f-setlist-notes" placeholder="Tuning, gear, changeovers, reminders..."></textarea></div>
         <div class="modal-actions">
           <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
           <button class="btn btn-primary" onclick="createSetlist()">Create</button>
@@ -606,7 +658,10 @@ function renderSetlistModal(){
 function createSetlist(){
   const name = document.getElementById('f-setlist-name').value.trim();
   if(!name){ alert('Give the setlist a name.'); return; }
-  const sl = {id: uid(), name, songIds: []};
+  const date = document.getElementById('f-setlist-date').value.trim();
+  const venue = document.getElementById('f-setlist-venue').value.trim();
+  const notes = document.getElementById('f-setlist-notes').value.trim();
+  const sl = {id: uid(), name, date, venue, notes, songIds: []};
   state.setlists.push(sl);
   saveSetlists();
   state.modal = null;
@@ -640,6 +695,8 @@ function renderSetlistDetail(){
       <h2>${esc(sl.name)}</h2>
       <button class="btn btn-ghost" onclick="window.print()">Print</button>
     </div>
+    ${(sl.date||sl.venue)?`<div style="color:var(--text-dim);margin:-8px 0 18px;text-align:center">${esc(sl.date||'')}${sl.date&&sl.venue?' · ':''}${esc(sl.venue||'')}</div>`:''}
+    ${sl.notes?`<div class="lyrics-box" style="margin-bottom:18px;color:var(--text)">${esc(sl.notes)}</div>`:''}
   `;
 
   if(sl.songIds.length === 0){
