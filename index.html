@@ -27,10 +27,11 @@
     nav a:hover,nav a:focus-visible{color:var(--acid)}
     .hero{position:relative;isolation:isolate;min-height:100svh;display:grid;align-content:center;padding:120px clamp(22px,7vw,110px) 80px;max-width:1450px;margin:auto}
     .hero>*:not(.hero-transmission){position:relative;z-index:2}
-    .hero-transmission{position:absolute;z-index:1;top:50%;right:clamp(22px,5vw,72px);width:min(43vw,650px);aspect-ratio:16/9;transform:translateY(-44%);overflow:hidden;border:1px solid rgba(185,255,74,.42);background:#000;box-shadow:0 0 55px rgba(0,0,0,.72),0 0 24px rgba(185,255,74,.08);opacity:.56;transition:opacity .35s ease,filter .35s ease;filter:saturate(.72) contrast(1.12)}
+    .hero-transmission{position:absolute;z-index:1;top:50%;right:clamp(22px,5vw,72px);width:min(46vw,700px);aspect-ratio:16/9;transform:translateY(-44%);overflow:hidden;background:#000;box-shadow:0 0 80px rgba(0,0,0,.35);opacity:.62;transition:opacity .35s ease,filter .35s ease;filter:saturate(.72) contrast(1.12);-webkit-mask-image:radial-gradient(ellipse at center,#000 42%,rgba(0,0,0,.96) 58%,rgba(0,0,0,.55) 72%,transparent 100%);mask-image:radial-gradient(ellipse at center,#000 42%,rgba(0,0,0,.96) 58%,rgba(0,0,0,.55) 72%,transparent 100%)}
     .hero-transmission:hover{opacity:.92;filter:saturate(1) contrast(1.05)}
     .hero-transmission::after{content:"DISCLOSURE FEED // LIVE-ISH";position:absolute;left:12px;bottom:9px;z-index:2;color:var(--acid);font-size:.55rem;letter-spacing:.15em;text-shadow:0 2px 8px #000;pointer-events:none}
     .hero-transmission iframe{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);border:0;pointer-events:none}
+    .hero-transmission-link{position:absolute;inset:0;z-index:3}
     .eyebrow{display:flex;align-items:center;gap:12px;color:var(--acid);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase}
     .pulse{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 0 rgba(185,255,74,.7);animation:pulse 2s infinite}
     @keyframes pulse{70%{box-shadow:0 0 0 12px rgba(185,255,74,0)}100%{box-shadow:0 0 0 0 rgba(185,255,74,0)}}
@@ -75,7 +76,7 @@
     .email-link{display:inline-block;margin:6px 0 4px;color:var(--ice);overflow-wrap:anywhere}
     .contact-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
     footer{max-width:1250px;margin:90px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#69736f;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em}
-    @media(max-width:900px){.hero-transmission{position:relative;top:auto;right:auto;width:min(100%,650px);margin-top:30px;transform:none;opacity:.72}.hero-transmission iframe{pointer-events:auto}}
+    @media(max-width:900px){.hero-transmission{position:relative;top:auto;right:auto;width:min(100%,650px);margin-top:30px;transform:none;opacity:.72}}
     @media(max-width:720px){header{position:absolute}nav a:not(:last-child){display:none}.hero{padding-top:105px}.logo{font-size:clamp(4.4rem,23vw,7rem);-webkit-text-stroke:1px #050607}.scroll{display:none}.grid,.bio-contact{grid-template-columns:1fr}.content{padding-top:70px}.portal{grid-template-columns:36px 1fr auto}.cover-grid{grid-template-columns:1fr}.sound-toggle{bottom:14px;right:14px}.background::after{background:linear-gradient(0deg,#050607 0%,rgba(2,5,4,.3) 70%,rgba(0,0,0,.55) 100%)}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pulse{animation:none}.background video{display:none}.button,.portal{transition:none}}
   </style>
@@ -108,6 +109,7 @@
         </div>
         <div class="hero-transmission" aria-label="Disclosure Dance video transmission">
           <iframe src="https://www.youtube-nocookie.com/embed/rMbCWwGqgX4?autoplay=1&amp;mute=1&amp;controls=0&amp;loop=1&amp;playlist=rMbCWwGqgX4&amp;playsinline=1&amp;rel=0&amp;modestbranding=1" title="Citywits — Disclosure Dance official video" loading="eager" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <a class="hero-transmission-link" href="https://www.youtube.com/watch?v=rMbCWwGqgX4" target="_blank" rel="noopener" aria-label="Watch Disclosure Dance with sound on YouTube"></a>
         </div>
         <span class="scroll">Scroll to descend</span>
       </section>
