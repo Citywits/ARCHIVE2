@@ -60,6 +60,10 @@
     .bio-copy{color:#b6c0bc;max-width:680px}
     .bio-copy p{margin:0 0 1em}
     .bio-photo{display:block;width:100%;margin-top:30px;border:1px solid var(--line);filter:saturate(.82) contrast(1.05);box-shadow:14px 14px 0 rgba(185,255,74,.08)}
+    .corridors{margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+    .corridors .section-label{margin-bottom:12px}
+    .corridor-link{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 2px;border-bottom:1px solid rgba(185,255,74,.18);color:var(--ice);text-decoration:none;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;transition:.2s ease}
+    .corridor-link:hover,.corridor-link:focus-visible{color:var(--acid);padding-left:8px}
     .bio-copy .declaration{color:var(--ice);font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-left:3px solid var(--acid);padding:12px 0 12px 18px;margin:26px 0}
     .contact-card{margin-top:45px;padding:28px;border:1px solid var(--line);background:rgba(185,255,74,.035)}
     .contact-card h3{margin:0 0 16px;color:var(--acid);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
@@ -128,6 +132,11 @@
             <p class="section-label">Personnel file / open channel</p>
             <h2>Bio + Contact</h2>
             <img class="bio-photo" src="Emerald-city/assets/images/LHCYE1889.JPG" alt="Citywits portrait" loading="lazy">
+            <div class="corridors" aria-label="Side corridors">
+              <p class="section-label">Corridors / less official material</p>
+              <a class="corridor-link" href="kitties.html"><span>Regarding the kitties</span><span>→</span></a>
+              <a class="corridor-link" href="unreliable-witness.html"><span>Unreliable personal records</span><span>→</span></a>
+            </div>
           </div>
           <div class="bio-copy">
             <p>Citywits is a musical project that I have maintained for about ten years post my prior band Small Drawings. I moved abroad and Citywits was originally founded as a way to make solo music when I didn’t have anyone around to make music with.</p>
@@ -174,3 +183,4 @@
   </script>
 </body>
 </html>
+
