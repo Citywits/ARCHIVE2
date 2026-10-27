@@ -104,7 +104,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="fas fa-car text-gold-400 w-4 text-center"></i>
-                        <span>In-Person Only at this time (Mobile Travel)</span>
+                <span>Mobile, in-person appointments</span>
                     </div>
                 </div>
             </div>
@@ -123,7 +123,7 @@
                 <a href="mailto:drew.ernhout@gmail.com" class="flex flex-col items-center justify-center p-3 bg-navy-900 text-white rounded-xl hover:bg-navy-950 transition active:scale-95 shadow-sm">
                     <i class="fas fa-envelope text-lg text-gold-400 mb-1"></i>
                     <span class="font-bold text-xs sm:text-sm">Email Drew</span>
-                    <span class="text-[10px] text-gray-300">Direct Message</span>
+                    <span class="text-[10px] text-gray-300">Email App</span>
                 </a>
 
                 <button onclick="openBookingModal()" class="flex flex-col items-center justify-center p-3 btn-gold rounded-xl shadow-sm active:scale-95 font-bold">
@@ -161,10 +161,6 @@
                 <i class="fas fa-file-shield text-gold-600"></i>
                 <span>$10k State Surety Bonded</span>
             </div>
-            <div class="flex items-center gap-1.5">
-                <i class="fas fa-user-check text-gold-600"></i>
-                <span>Background Checked</span>
-            </div>
         </section>
 
         <!-- Scope Clarification Notice -->
@@ -179,7 +175,7 @@
         <section class="p-5 sm:p-6 bg-white border-b border-gray-200">
             <h2 class="serif-title text-lg font-bold text-navy-900 mb-3 flex items-center gap-2">
                 <i class="fas fa-stamp text-gold-500 text-sm"></i>
-                Nevada Authorized Services
+                Notary Services & Documents
             </h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
@@ -249,7 +245,7 @@
             <div class="mb-4">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-gold-600 bg-gold-400/10 px-2.5 py-1 rounded-full">In-Person Mobile Visit</span>
                 <h3 class="serif-title text-xl font-bold text-navy-900 mt-1.5">Request Notary Appointment</h3>
-                <p class="text-xs text-gray-500">Submitting this form prepares a direct email inquiry to Drew Ernhout.</p>
+                <p class="text-xs text-gray-500">This form opens an email draft. Review and send it in your email app.</p>
             </div>
 
             <form id="booking-form" onsubmit="handleBookingSubmit(event)" class="space-y-3 text-xs sm:text-sm">
@@ -300,7 +296,7 @@
                 <div class="pt-2">
                     <button type="submit" class="w-full py-3 bg-navy-900 text-white font-bold rounded-xl hover:bg-navy-950 transition text-sm shadow border border-gold-400/40 flex items-center justify-center gap-2">
                         <i class="fas fa-paper-plane text-gold-400"></i>
-                        <span>Send Email Request to Drew</span>
+                        <span>Open Email Draft to Drew</span>
                     </button>
                 </div>
             </form>
@@ -329,6 +325,7 @@
 
     <!-- JS Functionality -->
     <script>
+        const cardURL = 'https://citywitsarchive.com/notary-card.html';
         // Notification Toast
         function showToast(message, isSuccess = true) {
             const toast = document.getElementById('toast');
@@ -359,7 +356,7 @@ TITLE:Commissioned Notary Public & Loan Signing Agent
 TEL;TYPE=CELL,VOICE:775-502-9517
 EMAIL;TYPE=INTERNET,WORK:drew.ernhout@gmail.com
 NOTE:NV Notary Public Appointment #26-1355-02. In-Person Mobile Notary serving Reno & Northern Nevada.
-URL:${window.location.href}
+URL:${cardURL}
 END:VCARD`;
 
             const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8;' });
@@ -392,7 +389,7 @@ END:VCARD`;
         function copyCardURL() {
             const dummy = document.createElement("textarea");
             document.body.appendChild(dummy);
-            dummy.value = window.location.href;
+            dummy.value = cardURL;
             dummy.select();
             document.execCommand("copy");
             document.body.removeChild(dummy);
@@ -406,7 +403,8 @@ END:VCARD`;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
-            const today = new Date().toISOString().split('T')[0];
+            const localDate = new Date();
+            const today = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
             document.getElementById('preferred-date').min = today;
         }
 
@@ -425,14 +423,14 @@ END:VCARD`;
             const date = document.getElementById('preferred-date').value;
             const time = document.getElementById('preferred-time').value;
 
-            // Trigger mailto email back to Drew automatically
+            // Open the visitor's email app with a draft; the visitor sends it.
             const subject = encodeURIComponent(`In-Person Notary Request: ${name}`);
             const body = encodeURIComponent(`Name: ${name}\nPhone: ${phone}\nDocument: ${doc}\nLocation: ${location}\nDate: ${date}\nTime: ${time}`);
             window.location.href = `mailto:drew.ernhout@gmail.com?subject=${subject}&body=${body}`;
 
             closeBookingModal();
             document.getElementById('booking-form').reset();
-            showToast(`Thank you ${name}! Appointment request prepared.`);
+            showToast('Email draft opened. Please review and send it in your email app.');
         }
 
         // QR Code Modal Logic
@@ -446,7 +444,7 @@ END:VCARD`;
                 const qrContainer = document.getElementById("qrcode");
                 qrContainer.innerHTML = "";
                 new QRCode(qrContainer, {
-                    text: window.location.href,
+                    text: cardURL,
                     width: 150,
                     height: 150,
                     colorDark : "#0B192C",
